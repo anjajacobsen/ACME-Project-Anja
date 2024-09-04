@@ -1,3 +1,8 @@
-#!/usr/bin/env node
+#!/usr/bin/env node 
+//got above line from ChatGPT [1]
 
-console.log("Testing output for typescript");
+//get the mode from ./run {input}
+let input_args: string[] = process.argv.slice(2); //gets user arguments pass in from run bash script REF: [2]
+let mode: string = input_args.length > 0 ? input_args[0] : "test"; //if no mode is passed in, default to test
+
+console.log(mode);
