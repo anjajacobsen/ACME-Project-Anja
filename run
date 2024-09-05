@@ -1,6 +1,28 @@
 #!/bin/bash
-npm install --save-dev typescript
-npm install --save-dev @types/node
 
-chmod +x ./src/main.ts
-npx ts-node ./src/main.ts "$@"
+echo "starting"
+
+#install option to install dependencies
+if [ "$1" == "install" ]; then
+    npm install
+    exit 0
+fi
+
+#test option to run our testing file
+if [ "$1" == "test" ]; then
+    npx tsc ./src/test.ts
+    node ./src/test.js
+    exit 0
+fi
+
+#assuming its not install or test, and SOME argument is passed
+#we will assume it is a filepath and verify in our main.ts file
+if [ -n "$1" ]; then
+    npx tsc ./src/main.ts
+    node ./src/main.js "$1"
+    exit 0
+fi
+
+#if no argument is passed, exit 1 for error and print message
+echo "error, no arguments passed"
+exit 1
