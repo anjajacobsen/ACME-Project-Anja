@@ -1,3 +1,6 @@
 #!/bin/bash
-chmod +x ./src/run.ts
-npx ts-node ./src/run.ts "$@"
+npm install --save-dev typescript
+npm install --save-dev @types/node
+
+chmod +x ./src/main.ts
+npx ts-node ./src/main.ts "$@"
