@@ -1,7 +1,7 @@
 {
   "compilerOptions": { //THESE SETTINGS WERE SOURCED FROM CHATGPT [1]
     "outDir": "./dist", //output directory for compiled files
-    "rootDir": "./src", //soure direcroty for typescript files
+    "rootDir": "./src", //source direcroty for typescript files
     "moduleResolution": "node", //use Node.js module resolution
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
