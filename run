@@ -1,6 +1,9 @@
 #!/bin/bash
-npm install --save-dev typescript
-npm install --save-dev @types/node
+"$0"
+echo "starting..."
 
-chmod +x ./src/main.ts
-npx ts-node ./src/main.ts "$@"
+if [ "$0" == "install" ]; then
+    echo "installing"
+    npm install
+else
+    echo "error"
