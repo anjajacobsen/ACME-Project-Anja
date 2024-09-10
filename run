@@ -4,7 +4,23 @@ echo "starting"
 
 #install option to install dependencies
 if [ "$1" == "install" ]; then
+    echo "installing dependencies"
+
+    if ! command -v node &> /dev/null; then #checks for node.js 
+        echo "node js not found, installing time!"
+        sudo apt update
+        sudo apt install -y nodejs
+    fi
+    echo "node js found!"
+
+    if ! command -v npm &> /dev/null; then #checks for npm
+        echo "npm not found, installing time!"
+        sudo apt install -y npm
+    fi
+    echo "npm found!"
+
     npm install
+
     exit 0
 fi
 
@@ -25,4 +41,5 @@ fi
 
 #if no argument is passed, exit 1 for error and print message
 echo "error, no arguments passed"
+
 exit 1
