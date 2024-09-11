@@ -11,7 +11,7 @@ fi
 #test option to run our testing file
 if [ "$1" == "test" ]; then
     npx tsc ./src/test.ts
-    node ./src/test.js
+    node ./src/test.js 
     exit 0
 fi
 
