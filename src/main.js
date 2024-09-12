@@ -36,95 +36,35 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var dotenv = require("dotenv");
-// get GitHub token from .env file
-dotenv.config();
-var TOKEN = process.env.GITHUB_TOKEN;
-// GraphQL query to fetch GitHub repository data
-var query = "\n  query {\n    repository(owner: \"ECE-461-Team-16\", name: \"ACME-Project\") {\n      name\n      owner {\n        login\n      }\n      forks {\n        totalCount\n      }\n      issues(last: 20) {\n        totalCount\n        edges {\n          node {\n            title\n            createdAt\n            closedAt\n          }\n        }\n      }\n      closedIssues: issues(states: CLOSED) {\n        totalCount\n      }\n      mentionableUsers(first: 100) {\n        edges {\n          node {\n            login\n            url\n            contributionsCollection {\n              contributionCalendar {\n                totalContributions\n              }\n              commitContributionsByRepository(maxRepositories: 1) {\n                contributions(first: 1, orderBy: { field: OCCURRED_AT, direction: ASC }) {\n                  edges {\n                    node {\n                      occurredAt\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }";
-// single endpoint
-var GITHUB_API_URL = 'https://api.github.com/graphql';
-// Function to make API request using fetch
-function fetchGitHubData() {
-    return __awaiter(this, void 0, void 0, function () {
-        var response, result;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch(GITHUB_API_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': "Bearer ".concat(TOKEN),
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ query: query }),
-                    })];
-                case 1:
-                    response = _a.sent();
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch data: ".concat(response.statusText));
-                    }
-                    return [4 /*yield*/, response.json()];
-                case 2:
-                    result = _a.sent();
-                    return [2 /*return*/, result];
-            }
-        });
+// import fetch/print functions and interfaces
+var GtiHubAPIcaller_1 = require("./GtiHubAPIcaller");
+var owner = 'ECE-461-Team-16';
+var repository = 'ACME-Project';
+(function () { return __awaiter(void 0, void 0, void 0, function () {
+    var test, test2, test3, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 4, , 5]);
+                return [4 /*yield*/, (0, GtiHubAPIcaller_1.default)(owner, repository)];
+            case 1:
+                test = _a.sent();
+                return [4 /*yield*/, (0, GtiHubAPIcaller_1.fetchRepositoryIssues)(owner, repository)];
+            case 2:
+                test2 = _a.sent();
+                return [4 /*yield*/, (0, GtiHubAPIcaller_1.fetchRepositoryUsers)(owner, repository)];
+            case 3:
+                test3 = _a.sent();
+                // Print repository information
+                (0, GtiHubAPIcaller_1.printRepositoryInfo)(test);
+                (0, GtiHubAPIcaller_1.printRepositoryIssues)(test2);
+                (0, GtiHubAPIcaller_1.printRepositoryUsers)(test3);
+                return [3 /*break*/, 5];
+            case 4:
+                error_1 = _a.sent();
+                console.error('Error:', error_1);
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
+        }
     });
-}
-// Function to print repository details
-function printRepositoryDetails(repo) {
-    console.log('Repository:', repo.name);
-    console.log('Owner:', repo.owner.login);
-    console.log('Forks:', repo.forks.totalCount);
-    console.log('Total Issues:', repo.issues.totalCount);
-    console.log('Total Closed Issues:', repo.closedIssues.totalCount);
-}
-// Function to print issue details
-function printIssueDetails(issues) {
-    if (issues.edges && issues.edges.length > 0) {
-        console.log('\nIssue Details:');
-        issues.edges.forEach(function (issue, index) {
-            console.log("\nIssue ".concat(index + 1, ":"));
-            console.log("Title: ".concat(issue.node.title));
-            console.log("Opened At: ".concat(issue.node.createdAt));
-            console.log("Closed At: ".concat(issue.node.closedAt || 'Still open'));
-        });
-    }
-    else {
-        console.log('No issue details available.');
-    }
-}
-// Function to print mentionable user details
-function printMentionableUsers(users) {
-    var totalContributions = 0;
-    if (users.edges && users.edges.length > 0) {
-        console.log('\nMentionable Users:');
-        users.edges.forEach(function (user, index) {
-            var _a, _b, _c, _d, _e, _f;
-            var contributions = user.node.contributionsCollection.contributionCalendar.totalContributions;
-            totalContributions += contributions;
-            // Get the first contribution date, if available
-            var firstContribution = ((_f = (_e = (_d = (_c = (_b = (_a = user.node.contributionsCollection.commitContributionsByRepository) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.contributions) === null || _c === void 0 ? void 0 : _c.edges) === null || _d === void 0 ? void 0 : _d[0]) === null || _e === void 0 ? void 0 : _e.node) === null || _f === void 0 ? void 0 : _f.occurredAt) || 'No contributions';
-            console.log("\nUser ".concat(index + 1, ":"));
-            console.log("Username: ".concat(user.node.login));
-            console.log("Profile URL: ".concat(user.node.url));
-            console.log("Total Contributions: ".concat(contributions));
-            console.log("First Contribution Date: ".concat(firstContribution));
-        });
-        console.log("\nTotal Contributions from All Mentionable Users: ".concat(totalContributions));
-    }
-    else {
-        console.log('No mentionable users available.');
-    }
-}
-// Fetch data and print the details using the functions
-fetchGitHubData()
-    .then(function (info) {
-    var repo = info.data.repository;
-    printRepositoryDetails(repo);
-    printIssueDetails(repo.issues);
-    printMentionableUsers(repo.mentionableUsers);
-})
-    .catch(function (error) {
-    console.error('Error fetching GitHub data:', error);
-});
+}); })();
