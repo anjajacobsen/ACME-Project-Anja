@@ -179,6 +179,18 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
       const repoInfo:   RepositoryInfo   = await fetchRepositoryInfo(owner, repository);
       const repoIssues: RepositoryIssues = await fetchRepositoryIssues(owner, repository);
       const repoUsers:  RepositoryUsers  = await fetchRepositoryUsers(owner, repository);
+// import logger
+import logger from './logger';
+
+const owner = 'ECE-461-Team-16';
+const repository = 'ACME-Project';
+
+(async () => {
+  try {
+
+    const test: RepositoryInfo = await fetchRepositoryInfo(owner, repository);
+    const test2: RepositoryIssues = await fetchRepositoryIssues(owner, repository);
+    const test3: RepositoryUsers = await fetchRepositoryUsers(owner, repository);
 
       // print information (not required for project; for testing purposes)
       // printRepositoryInfo(repoInfo);

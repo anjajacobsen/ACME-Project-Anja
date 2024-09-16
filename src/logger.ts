@@ -1,4 +1,4 @@
-import winston from 'winston';
+import * as winston from 'winston';
 
 // Get log level from environment variable (default to 'info')
 const logLevel = process.env.LOG_LEVEL || 'info';
@@ -17,7 +17,7 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.File({ filename: logFile }),
-    new winston.transports.Console() // Optional: Log to console as well
+    new winston.transports.Console() // Delete if we don't want console output
   ]
 });
 

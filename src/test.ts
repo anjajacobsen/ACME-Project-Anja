@@ -65,3 +65,6 @@ async function fetchRepositoryInfo(owner: string, name: string) {
 fetchRepositoryInfo('browserify', 'browserify')
   .then((repoInfo) => console.log('Repository Info:', repoInfo))
   .catch((error) => console.error(error.message));
+
+import logger from './logger';
+logger.info('Hi there!'); // testing logger
