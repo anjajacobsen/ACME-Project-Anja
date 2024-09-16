@@ -3,7 +3,7 @@
 import * as fs from 'fs';
 
 // import logger
-import logger from './logger';
+import logger from './logger'; 
 
 //get the mode from ./run {input}
 let input_args: string[] = process.argv.slice(2); //gets user arguments pass in from run bash script REF: [2]
@@ -161,6 +161,9 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
   let owner : string;
   let repository : string;
 
+  owner = "";
+  repository = "";
+
   if( link_split[2] === "github.com" ){ //if its github we can just use owner repository from url
     console.log("GITHUB");
     owner = link_split[3];
@@ -182,23 +185,7 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
       const repoInfo:   RepositoryInfo   = await fetchRepositoryInfo(owner, repository);
       const repoIssues: RepositoryIssues = await fetchRepositoryIssues(owner, repository);
       const repoUsers:  RepositoryUsers  = await fetchRepositoryUsers(owner, repository);
-
-
-const owner = 'ECE-461-Team-16';
-const repository = 'ACME-Project';
-
-(async () => {
-  try {
-
-    const test: RepositoryInfo = await fetchRepositoryInfo(owner, repository);
-    const test2: RepositoryIssues = await fetchRepositoryIssues(owner, repository);
-    const test3: RepositoryUsers = await fetchRepositoryUsers(owner, repository);
-
-      // print information (not required for project; for testing purposes)
-      // printRepositoryInfo(repoInfo);
-      // printRepositoryIssues(repoIssues);
-      // printRepositoryUsers(repoUsers);
-
+      
       // call metric calculations
       const busFactor           = calculateBusFactorScore(repoUsers);
       const correctness         = calculateCorrectness(repoIssues);
