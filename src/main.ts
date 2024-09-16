@@ -158,6 +158,9 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
   let owner : string;
   let repository : string;
 
+  owner = "";
+  repository = "";
+
   if( link_split[2] === "github.com" ){ //if its github we can just use owner repository from url
     console.log("GITHUB");
     owner = link_split[3];

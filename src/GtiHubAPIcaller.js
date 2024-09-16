@@ -85,7 +85,7 @@ function fetchRepositoryIssues(owner, name) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    query = "\n  query {\n    repository(owner: \"".concat(owner, "\", name: \"").concat(name, "\") {\n        issues(first: 10) {\n            totalCount\n            edges {\n                node {\n                    title\n                    createdAt\n                    closedAt\n                }\n            }\n        }\n        closedIssues: issues(states: CLOSED) {\n          totalCount\n        }\n      }\n    }\n  ");
+                    query = "\n  query {\n    repository(owner: \"".concat(owner, "\", name: \"").concat(name, "\") {\n        issues(last: 50) {\n            totalCount\n            edges {\n                node {\n                    title\n                    createdAt\n                    closedAt\n                }\n            }\n        }\n        closedIssues: issues(states: CLOSED) {\n          totalCount\n        }\n      }\n    }\n  ");
                     return [4 /*yield*/, fetch(GITHUB_API_URL, {
                             method: 'POST',
                             headers: {
