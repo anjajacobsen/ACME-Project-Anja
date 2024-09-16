@@ -112,7 +112,7 @@ export async function fetchRepositoryIssues(owner: string, name: string): Promis
   const query = `
   query {
     repository(owner: "${owner}", name: "${name}") {
-        issues(first: 10) {
+        issues(last: 50) {
             totalCount
             edges {
                 node {

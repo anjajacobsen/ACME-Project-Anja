@@ -36,35 +36,43 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// import fetch/print functions and interfaces
-var GtiHubAPIcaller_1 = require("./GtiHubAPIcaller");
-var owner = 'ECE-461-Team-16';
-var repository = 'ACME-Project';
-(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var test, test2, test3, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 4, , 5]);
-                return [4 /*yield*/, (0, GtiHubAPIcaller_1.default)(owner, repository)];
-            case 1:
-                test = _a.sent();
-                return [4 /*yield*/, (0, GtiHubAPIcaller_1.fetchRepositoryIssues)(owner, repository)];
-            case 2:
-                test2 = _a.sent();
-                return [4 /*yield*/, (0, GtiHubAPIcaller_1.fetchRepositoryUsers)(owner, repository)];
-            case 3:
-                test3 = _a.sent();
-                // Print repository information
-                (0, GtiHubAPIcaller_1.printRepositoryInfo)(test);
-                (0, GtiHubAPIcaller_1.printRepositoryIssues)(test2);
-                (0, GtiHubAPIcaller_1.printRepositoryUsers)(test3);
-                return [3 /*break*/, 5];
-            case 4:
-                error_1 = _a.sent();
-                console.error('Error:', error_1);
-                return [3 /*break*/, 5];
-            case 5: return [2 /*return*/];
-        }
+var dotenv = require("dotenv");
+// stuff to grab token from .env file
+dotenv.config();
+var TOKEN = process.env.GITHUB_TOKEN;
+var GITHUB_API_URL = 'https://api.github.com/graphql';
+function fetchRepositoryInfo(owner, name) {
+    return __awaiter(this, void 0, void 0, function () {
+        var query, response, result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    query = "\n    query {\n      repository(owner: \"".concat(owner, "\", name: \"").concat(name, "\") {\n        name\n        owner {\n          login\n        }\n        forks {\n          totalCount\n        }\n        defaultBranchRef {\n          name\n          target {\n            ... on Commit {\n              history(first: 10) {\n                edges {\n                  node {\n                    committedDate\n                    author {\n                      name\n                    }\n                    message\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  ");
+                    return [4 /*yield*/, fetch(GITHUB_API_URL, {
+                            method: 'POST',
+                            headers: {
+                                Authorization: "Bearer ".concat(TOKEN),
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ query: query }),
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch data: ".concat(response.statusText));
+                    }
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    result = _a.sent();
+                    if (result.errors) {
+                        throw new Error("GraphQL errors: ".concat(JSON.stringify(result.errors)));
+                    }
+                    return [2 /*return*/, result.data.repository];
+            }
+        });
     });
-}); })();
+}
+// Example call
+fetchRepositoryInfo('browserify', 'browserify')
+    .then(function (repoInfo) { return console.log('Repository Info:', repoInfo); })
+    .catch(function (error) { return console.error(error.message); });
