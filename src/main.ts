@@ -2,6 +2,9 @@
 //got above line from ChatGPT REF: [1]
 import * as fs from 'fs';
 
+// import logger
+import logger from './logger';
+
 //get the mode from ./run {input}
 let input_args: string[] = process.argv.slice(2); //gets user arguments pass in from run bash script REF: [2]
 let filepath: string = input_args.length > 0 ? input_args[0] : "test"; //if no mode is passed in, default to test
@@ -179,8 +182,7 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
       const repoInfo:   RepositoryInfo   = await fetchRepositoryInfo(owner, repository);
       const repoIssues: RepositoryIssues = await fetchRepositoryIssues(owner, repository);
       const repoUsers:  RepositoryUsers  = await fetchRepositoryUsers(owner, repository);
-// import logger
-import logger from './logger';
+
 
 const owner = 'ECE-461-Team-16';
 const repository = 'ACME-Project';
