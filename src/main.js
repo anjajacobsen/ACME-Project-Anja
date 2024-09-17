@@ -42,11 +42,9 @@ var fs = require("fs");
 //get the mode from ./run {input}
 var input_args = process.argv.slice(2); //gets user arguments pass in from run bash script REF: [2]
 var filepath = input_args.length > 0 ? input_args[0] : "test"; //if no mode is passed in, default to test
-console.log(filepath);
 //read the urls from the given filepath REF: [3]
 var url_file = fs.readFileSync(filepath, 'utf-8'); //import file
 var urls = url_file.split('\n'); //split the urls up
-console.log(urls);
 // import fetch/print functions and interfaces
 var GtiHubAPIcaller_1 = require("./GtiHubAPIcaller");
 var License_1 = require("./License");
@@ -166,6 +164,7 @@ var _loop_1 = function (i) {
                     rampUp = calculateRampUpScore(repoUsers);
                     responsiveMaintainer = calculateResponsiveMaintainerScore(repoIssues);
                     // print out scores (for testing)
+                    console.log('Repository:   ', repository);
                     console.log('Bus Factor:  ', busFactor);
                     console.log('Correctness: ', correctness);
                     console.log('Ramp Up:     ', rampUp);
