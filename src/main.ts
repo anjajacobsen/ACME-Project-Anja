@@ -180,11 +180,14 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
   }
   
   // Non-API metric calculations
-  const foundLicense : number = getLicense(urls[i], repository); // get the license for the repo
+  // const foundLicense : number = getLicense(urls[i], repository); // get the license for the repo
 
 
   (async () => {
     try {
+      //get non-api metrics
+      const foundLicense: number = await getLicense(urls[i], repository);
+
       // get inferfaces to get all metrics for repository information
       const repoInfo:   RepositoryInfo   = await fetchRepositoryInfo(owner, repository);
       const repoIssues: RepositoryIssues = await fetchRepositoryIssues(owner, repository);
