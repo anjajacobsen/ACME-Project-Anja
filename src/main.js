@@ -49,6 +49,7 @@ var urls = url_file.split('\n'); //split the urls up
 console.log(urls);
 // import fetch/print functions and interfaces
 var GtiHubAPIcaller_1 = require("./GtiHubAPIcaller");
+var License_1 = require("./License");
 function calculateBusFactorScore(users) {
     // get total contributions for each user
     var contributions = users.data.repository.mentionableUsers.edges.map(function (user) { return user.node.contributionsCollection.contributionCalendar.totalContributions; });
@@ -127,20 +128,26 @@ var _loop_1 = function (i) {
     var link_split = urls[i].split("/"); //splits each url into different parts
     var owner;
     var repository;
+    owner = "";
+    repository = "";
     if (link_split[2] === "github.com") { //if its github we can just use owner repository from url
-        console.log("GITHUB");
         owner = link_split[3];
-        repository = link_split[4];
+        // repository = link_split[4];
+        repository = link_split[4].replace(".git", "");
     }
     // ** STILL NEEDS TO BE FIXED **
-    if (link_split[2] === "www.npmjs.com") {
+    else if (link_split[2] === "www.npmjs.com") {
         //whatever our get link for npm will be (hard coding with working test case for now)
-        console.log("NPMJS");
         owner = "browserify";
         repository = "browserify";
     }
+    else {
+        console.log("error");
+    }
+    // Non-API metric calculations
+    var foundLicense = (0, License_1.getLicense)(urls[i], repository); // get the license for the repo
     (function () { return __awaiter(void 0, void 0, void 0, function () {
-        var repoInfo, repoIssues, repoUsers, busFactor, correctness, rampUp, responveiMaintainer, error_1;
+        var repoInfo, repoIssues, repoUsers, busFactor, correctness, rampUp, responsiveMaintainer, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -157,12 +164,13 @@ var _loop_1 = function (i) {
                     busFactor = calculateBusFactorScore(repoUsers);
                     correctness = calculateCorrectness(repoIssues);
                     rampUp = calculateRampUpScore(repoUsers);
-                    responveiMaintainer = calculateResponsiveMaintainerScore(repoIssues);
+                    responsiveMaintainer = calculateResponsiveMaintainerScore(repoIssues);
                     // print out scores (for testing)
                     console.log('Bus Factor:  ', busFactor);
                     console.log('Correctness: ', correctness);
                     console.log('Ramp Up:     ', rampUp);
-                    console.log('Responsive Maintainer: ', responveiMaintainer);
+                    console.log('Responsive Maintainer: ', responsiveMaintainer);
+                    console.log('License Found: ', foundLicense);
                     return [3 /*break*/, 5];
                 case 4:
                     error_1 = _a.sent();
