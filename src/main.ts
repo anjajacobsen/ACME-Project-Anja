@@ -22,6 +22,7 @@ import fetchRepositoryInfo, { fetchRepositoryUsers, fetchRepositoryIssues,
                               RepositoryInfo, RepositoryIssues, RepositoryUsers,
                               printRepositoryUsers, printRepositoryIssues, printRepositoryInfo 
                             } from './GtiHubAPIcaller';
+import { getLicense } from './License';
 
 function calculateBusFactorScore(users: RepositoryUsers): number {
   // get total contributions for each user
@@ -158,6 +159,7 @@ function calculateResponsiveMaintainerScore(issues: RepositoryIssues): number {
 for( let i = 0; i < urls.length; i++){ //loop through all of the urls
   let link_split = urls[i].split("/"); //splits each url into different parts
 
+
   let owner : string;
   let repository : string;
 
@@ -165,20 +167,25 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
   repository = "";
 
   if( link_split[2] === "github.com" ){ //if its github we can just use owner repository from url
-    console.log("GITHUB");
     owner = link_split[3];
-    repository = link_split[4];
+    // repository = link_split[4];
+    repository = link_split[4].replace(".git", "");
   }
   
   // ** STILL NEEDS TO BE FIXED **
-  if( link_split[2] === "www.npmjs.com" ){
+  else if( link_split[2] === "www.npmjs.com" ){
     //whatever our get link for npm will be (hard coding with working test case for now)
-    
-    console.log("NPMJS");
     owner = "browserify";
     repository = "browserify";
   }
+  else{
+    console.log("error");
+  }
   
+  // Non-API metric calculations
+  const foundLicense : number = getLicense(urls[i], repository); // get the license for the repo
+
+
   (async () => {
     try {
       // get inferfaces to get all metrics for repository information
@@ -186,17 +193,18 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
       const repoIssues: RepositoryIssues = await fetchRepositoryIssues(owner, repository);
       const repoUsers:  RepositoryUsers  = await fetchRepositoryUsers(owner, repository);
       
-      // call metric calculations
+      // API metric calculations
       const busFactor           = calculateBusFactorScore(repoUsers);
       const correctness         = calculateCorrectness(repoIssues);
       const rampUp              = calculateRampUpScore(repoUsers);
-      const responveiMaintainer = calculateResponsiveMaintainerScore(repoIssues);
+      const responsiveMaintainer = calculateResponsiveMaintainerScore(repoIssues);
 
       // print out scores (for testing)
       console.log('Bus Factor:  ', busFactor);
       console.log('Correctness: ', correctness);
       console.log('Ramp Up:     ', rampUp);
-      console.log('Responsive Maintainer: ', responveiMaintainer);
+      console.log('Responsive Maintainer: ', responsiveMaintainer);
+      console.log('License Found: ', foundLicense);
   } 
   catch (error) {
     console.error('Error:', error); 

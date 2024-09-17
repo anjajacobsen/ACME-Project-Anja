@@ -25,6 +25,9 @@ if [ "$1" == "install" ]; then
 
     npm install winston
 
+    npm install shelljs
+
+
     exit 0
 fi
 
