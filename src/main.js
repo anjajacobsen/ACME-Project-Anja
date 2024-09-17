@@ -143,21 +143,24 @@ var _loop_1 = function (i) {
         console.log("error");
     }
     // Non-API metric calculations
-    var foundLicense = (0, License_1.getLicense)(urls[i], repository); // get the license for the repo
+    // const foundLicense : number = getLicense(urls[i], repository); // get the license for the repo
     (function () { return __awaiter(void 0, void 0, void 0, function () {
-        var repoInfo, repoIssues, repoUsers, busFactor, correctness, rampUp, responsiveMaintainer, error_1;
+        var foundLicense, repoInfo, repoIssues, repoUsers, busFactor, correctness, rampUp, responsiveMaintainer, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 4, , 5]);
-                    return [4 /*yield*/, (0, GtiHubAPIcaller_1.default)(owner, repository)];
+                    _a.trys.push([0, 5, , 6]);
+                    return [4 /*yield*/, (0, License_1.getLicense)(urls[i], repository)];
                 case 1:
+                    foundLicense = _a.sent();
+                    return [4 /*yield*/, (0, GtiHubAPIcaller_1.default)(owner, repository)];
+                case 2:
                     repoInfo = _a.sent();
                     return [4 /*yield*/, (0, GtiHubAPIcaller_1.fetchRepositoryIssues)(owner, repository)];
-                case 2:
+                case 3:
                     repoIssues = _a.sent();
                     return [4 /*yield*/, (0, GtiHubAPIcaller_1.fetchRepositoryUsers)(owner, repository)];
-                case 3:
+                case 4:
                     repoUsers = _a.sent();
                     busFactor = calculateBusFactorScore(repoUsers);
                     correctness = calculateCorrectness(repoIssues);
@@ -170,12 +173,12 @@ var _loop_1 = function (i) {
                     console.log('Ramp Up:     ', rampUp);
                     console.log('Responsive Maintainer: ', responsiveMaintainer);
                     console.log('License Found: ', foundLicense);
-                    return [3 /*break*/, 5];
-                case 4:
+                    return [3 /*break*/, 6];
+                case 5:
                     error_1 = _a.sent();
                     console.error('Error:', error_1);
-                    return [3 /*break*/, 5];
-                case 5: return [2 /*return*/];
+                    return [3 /*break*/, 6];
+                case 6: return [2 /*return*/];
             }
         });
     }); })();

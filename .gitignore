@@ -1,4 +1,6 @@
 .env
 Sample Url File.txt
 package-lock.json
-./src/*.js
+node_modules
+node_modules/.package-lock.json
+src/*.js

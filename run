@@ -27,6 +27,7 @@ if [ "$1" == "install" ]; then
 
     npm install shelljs
 
+    npm install isomorphic-git
 
     exit 0
 fi
