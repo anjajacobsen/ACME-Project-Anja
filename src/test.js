@@ -37,6 +37,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var dotenv = require("dotenv");
+var logger_1 = require("./logger");
+logger_1.default.info('Hi there!'); // testing logger
 // stuff to grab token from .env file
 dotenv.config();
 var TOKEN = process.env.GITHUB_TOKEN;

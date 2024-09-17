@@ -1,4 +1,6 @@
 import * as dotenv from 'dotenv';
+import logger from './logger';
+logger.info('Hi there!'); // testing logger
 
 // stuff to grab token from .env file
 dotenv.config();

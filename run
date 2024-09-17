@@ -23,6 +23,8 @@ if [ "$1" == "install" ]; then
 
     npm install dotenv
 
+    npm install winston
+
     exit 0
 fi
 
