@@ -49,42 +49,120 @@ var urls = url_file.split('\n'); //split the urls up
 console.log(urls);
 // import fetch/print functions and interfaces
 var GtiHubAPIcaller_1 = require("./GtiHubAPIcaller");
+function calculateBusFactorScore(users) {
+    // get total contributions for each user
+    var contributions = users.data.repository.mentionableUsers.edges.map(function (user) { return user.node.contributionsCollection.contributionCalendar.totalContributions; });
+    // get total contributions by everyone
+    var totalContributions = contributions.reduce(function (acc, val) { return acc + val; }, 0);
+    // total number users
+    var totalUsers = contributions.length;
+    // average contribution per person
+    var averageContribution = totalContributions / totalUsers;
+    // get number of users with contributions >= average contributions per person
+    var aboveAverageContributors = contributions.filter(function (contribution) { return contribution >= averageContribution; }).length;
+    var busFactorScore = aboveAverageContributors / totalUsers;
+    // round to the nearest hundredth
+    return Math.round(busFactorScore * 100) / 100;
+}
+function calculateCorrectness(issues) {
+    var totalIssues = issues.data.repository.issues.totalCount;
+    var completedIssues = issues.data.repository.closedIssues.totalCount;
+    if (totalIssues === 0) {
+        return 1;
+    }
+    var correctness = completedIssues / totalIssues;
+    // round to the nearest hundredth
+    return Math.round(correctness * 100) / 100;
+}
+function calculateRampUpScore(users) {
+    // get first contribution date for each user (from ChatGPT)
+    var firstContributionDates = users.data.repository.mentionableUsers.edges
+        .map(function (user) {
+        var contributionDates = user.node.contributionsCollection.commitContributionsByRepository.flatMap(function (repo) {
+            return repo.contributions.edges.map(function (contribution) { return new Date(contribution.node.occurredAt).getTime(); });
+        });
+        return contributionDates.length ? Math.min.apply(Math, contributionDates) : null;
+    })
+        .filter(function (date) { return date !== null; });
+    // if no valid contribution dates, return 0 as the score.
+    // need at least two contributors to calculate the average
+    if (firstContributionDates.length < 2) {
+        return 0;
+    }
+    // find the time differences between contributors (in weeks) 
+    var timeDifferences = [];
+    for (var i = 1; i < firstContributionDates.length; i++) {
+        var diffInWeeks = (firstContributionDates[i] - firstContributionDates[i - 1]) / (1000 * 3600 * 24 * 7);
+        timeDifferences.push(diffInWeeks);
+    }
+    // find average (in weeks)
+    var averageTimeDifference = timeDifferences.reduce(function (acc, val) { return acc + val; }, 0) / timeDifferences.length;
+    var rampUpScore = 1 / averageTimeDifference;
+    // round to the nearest hundredth
+    return Math.round(rampUpScore * 100) / 100;
+}
+function calculateResponsiveMaintainerScore(issues) {
+    // get date one month ago from today
+    var currentDate = new Date();
+    var oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(currentDate.getMonth() - 1); // set for one month ago
+    // get issue creation and closed dates from past month (from ChatGPT)
+    var recentIssues = issues.data.repository.issues.edges.filter(function (issue) {
+        var createdAt = new Date(issue.node.createdAt);
+        return createdAt >= oneMonthAgo;
+    });
+    // get total number of issues created within the past month
+    var totalIssues = recentIssues.length;
+    // get number of resolved issues within the past month
+    var resolvedIssues = recentIssues.filter(function (issue) { return issue.node.closedAt !== null; }).length;
+    // if no issues were created in the past month
+    if (totalIssues === 0) {
+        return 0;
+    }
+    var responsiveMaintainer = resolvedIssues / totalIssues;
+    // round to the nearest hundredth
+    return Math.round(responsiveMaintainer * 100) / 100;
+}
 var _loop_1 = function (i) {
-    var link_split = urls[i].split("/");
+    var link_split = urls[i].split("/"); //splits each url into different parts
     var owner;
     var repository;
-    if (link_split[2] === "github.com") {
+    if (link_split[2] === "github.com") { //if its github we can just use owner repository from url
         console.log("GITHUB");
         owner = link_split[3];
         repository = link_split[4];
     }
+    // ** STILL NEEDS TO BE FIXED **
     if (link_split[2] === "www.npmjs.com") {
         //whatever our get link for npm will be (hard coding with working test case for now)
         console.log("NPMJS");
         owner = "browserify";
         repository = "browserify";
     }
-    // const owner = 'ECE-461-Team-16';
-    // const repository = 'ACME-Project';
     (function () { return __awaiter(void 0, void 0, void 0, function () {
-        var test, test2, test3, error_1;
+        var repoInfo, repoIssues, repoUsers, busFactor, correctness, rampUp, responveiMaintainer, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 4, , 5]);
                     return [4 /*yield*/, (0, GtiHubAPIcaller_1.default)(owner, repository)];
                 case 1:
-                    test = _a.sent();
+                    repoInfo = _a.sent();
                     return [4 /*yield*/, (0, GtiHubAPIcaller_1.fetchRepositoryIssues)(owner, repository)];
                 case 2:
-                    test2 = _a.sent();
+                    repoIssues = _a.sent();
                     return [4 /*yield*/, (0, GtiHubAPIcaller_1.fetchRepositoryUsers)(owner, repository)];
                 case 3:
-                    test3 = _a.sent();
-                    // Print repository information
-                    (0, GtiHubAPIcaller_1.printRepositoryInfo)(test);
-                    (0, GtiHubAPIcaller_1.printRepositoryIssues)(test2);
-                    (0, GtiHubAPIcaller_1.printRepositoryUsers)(test3);
+                    repoUsers = _a.sent();
+                    busFactor = calculateBusFactorScore(repoUsers);
+                    correctness = calculateCorrectness(repoIssues);
+                    rampUp = calculateRampUpScore(repoUsers);
+                    responveiMaintainer = calculateResponsiveMaintainerScore(repoIssues);
+                    // print out scores (for testing)
+                    console.log('Bus Factor:  ', busFactor);
+                    console.log('Correctness: ', correctness);
+                    console.log('Ramp Up:     ', rampUp);
+                    console.log('Responsive Maintainer: ', responveiMaintainer);
                     return [3 /*break*/, 5];
                 case 4:
                     error_1 = _a.sent();
@@ -95,6 +173,25 @@ var _loop_1 = function (i) {
         });
     }); })();
 };
+/////////////// FOR TESTING //////////////
+// const owner = 'ECE-461-Team-16'; 
+// const repository = 'ACME-Project';
+// can delete the section below if you want
+// const owner = 'nullivex';
+// const repository = 'nodist';
+// const owner = 'browserify';
+// const repository = 'browserify';
+// const owner = 'cloudinary';
+// const repository = 'cloudinary_npm';
+// const owner = 'lodash';
+// const repository = 'lodash';
+// const owner = 'expressjs';
+// const repository = 'express';
+// const owner = 'mrdoob';
+// const repository = 'three.js';
+// const owner = 'prathameshnetake;
+// const repository = 'libvlc';
+//////////////////////////////////////////
 for (var i = 0; i < urls.length; i++) {
     _loop_1(i);
 }
