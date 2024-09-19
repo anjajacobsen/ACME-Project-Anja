@@ -17,9 +17,22 @@ const urls = url_file.split('\n'); //split the urls up
 // import fetch/print functions and interfaces
 import fetchRepositoryInfo, { fetchRepositoryUsers, fetchRepositoryIssues,
                               RepositoryInfo, RepositoryIssues, RepositoryUsers,
-                              printRepositoryUsers, printRepositoryIssues, printRepositoryInfo 
+                              printRepositoryUsers, printRepositoryIssues, printRepositoryInfo,
+                              getNpmPackageGithubRepo 
                             } from './GtiHubAPIcaller';
 import { getLicense } from './License';
+
+// Get the GitHub repository URL for a given NPM package
+async function processPackageData(packageName: string) {
+  const githubRepo = await getNpmPackageGithubRepo(packageName);
+  
+  if (githubRepo) {
+      console.log(`GitHub Repository for ${packageName}: ${githubRepo}`);
+      // Now you can use this URL to make further GitHub API calls if needed
+  } else {
+      console.log(`No GitHub repository found for ${packageName}`);
+  }
+}
 
 function calculateBusFactorScore(users: RepositoryUsers): number {
   // get total contributions for each user
@@ -172,8 +185,9 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
   // ** STILL NEEDS TO BE FIXED **
   else if( link_split[2] === "www.npmjs.com" ){
     //whatever our get link for npm will be (hard coding with working test case for now)
-    owner = "browserify";
-    repository = "browserify";
+    //owner = "browserify";
+    //repository = "browserify";
+    processPackageData('browserify');
   }
   else{
     console.log("error");

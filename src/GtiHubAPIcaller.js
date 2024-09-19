@@ -39,10 +39,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = fetchRepositoryInfo;
 exports.fetchRepositoryIssues = fetchRepositoryIssues;
 exports.fetchRepositoryUsers = fetchRepositoryUsers;
+exports.getNpmPackageGithubRepo = getNpmPackageGithubRepo;
 exports.printRepositoryInfo = printRepositoryInfo;
 exports.printRepositoryIssues = printRepositoryIssues;
 exports.printRepositoryUsers = printRepositoryUsers;
 var dotenv = require("dotenv");
+var axios_1 = require("axios");
 // stuff to grab token from .env file
 dotenv.config();
 var TOKEN = process.env.GITHUB_TOKEN;
@@ -132,6 +134,40 @@ function fetchRepositoryUsers(owner, name) {
                 case 2:
                     result = _a.sent();
                     return [2 /*return*/, result];
+            }
+        });
+    });
+}
+/**
+ * Fetches NPM package details from the NPM registry and extracts the GitHub repository URL.
+ * @param packageName - The name of the NPM package to query.
+ * @returns The GitHub repository URL if available, otherwise null.
+ */
+function getNpmPackageGithubRepo(packageName) {
+    return __awaiter(this, void 0, void 0, function () {
+        var response, packageData, repoUrl, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, axios_1.default.get("https://registry.npmjs.org/".concat(packageName))];
+                case 1:
+                    response = _a.sent();
+                    packageData = response.data;
+                    // Check if the repository field exists and is a GitHub repository
+                    if (packageData.repository && packageData.repository.url) {
+                        repoUrl = packageData.repository.url;
+                        // Check if the URL points to GitHub
+                        if (repoUrl.includes('github.com')) {
+                            return [2 /*return*/, repoUrl];
+                        }
+                    }
+                    return [2 /*return*/, null]; // Return null if no valid GitHub repository is found
+                case 2:
+                    error_1 = _a.sent();
+                    console.error("Failed to fetch NPM package data for ".concat(packageName, ":"), error_1);
+                    return [2 /*return*/, null];
+                case 3: return [2 /*return*/];
             }
         });
     });

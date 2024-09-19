@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import axios from 'axios';
 
 // stuff to grab token from .env file
 dotenv.config();
@@ -194,6 +195,36 @@ export async function fetchRepositoryUsers(owner: string, name: string): Promise
   
   return result;
 }
+
+
+/**
+ * Fetches NPM package details from the NPM registry and extracts the GitHub repository URL.
+ * @param packageName - The name of the NPM package to query.
+ * @returns The GitHub repository URL if available, otherwise null.
+ */
+export async function getNpmPackageGithubRepo(packageName: string): Promise<string | null> {
+    try {
+        // Fetch the package metadata from the NPM registry
+        const response = await axios.get(`https://registry.npmjs.org/${packageName}`);
+        const packageData = response.data;
+
+        // Check if the repository field exists and is a GitHub repository
+        if (packageData.repository && packageData.repository.url) {
+            const repoUrl = packageData.repository.url;
+
+            // Check if the URL points to GitHub
+            if (repoUrl.includes('github.com')) {
+                return repoUrl;
+            }
+        }
+
+        return null; // Return null if no valid GitHub repository is found
+    } catch (error) {
+        console.error(`Failed to fetch NPM package data for ${packageName}:`, error);
+        return null;
+    }
+}
+
 
 /////// print functions ///////
 
