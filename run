@@ -29,6 +29,8 @@ if [ "$1" == "install" ]; then
 
     npm install isomorphic-git
 
+    npm install axios
+
     exit 0
 fi
 

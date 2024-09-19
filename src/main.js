@@ -48,6 +48,26 @@ var urls = url_file.split('\n'); //split the urls up
 // import fetch/print functions and interfaces
 var GtiHubAPIcaller_1 = require("./GtiHubAPIcaller");
 var License_1 = require("./License");
+function processPackageData(packageName) {
+    return __awaiter(this, void 0, void 0, function () {
+        var githubRepo;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, (0, GtiHubAPIcaller_1.getNpmPackageGithubRepo)(packageName)];
+                case 1:
+                    githubRepo = _a.sent();
+                    if (githubRepo) {
+                        console.log("GitHub Repository for ".concat(packageName, ": ").concat(githubRepo));
+                        // Now you can use this URL to make further GitHub API calls if needed
+                    }
+                    else {
+                        console.log("No GitHub repository found for ".concat(packageName));
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
 function calculateBusFactorScore(users) {
     // get total contributions for each user
     var contributions = users.data.repository.mentionableUsers.edges.map(function (user) { return user.node.contributionsCollection.contributionCalendar.totalContributions; });
@@ -136,8 +156,9 @@ var _loop_1 = function (i) {
     // ** STILL NEEDS TO BE FIXED **
     else if (link_split[2] === "www.npmjs.com") {
         //whatever our get link for npm will be (hard coding with working test case for now)
-        owner = "browserify";
-        repository = "browserify";
+        //owner = "browserify";
+        //repository = "browserify";
+        processPackageData('browserify');
     }
     else {
         console.log("error");
