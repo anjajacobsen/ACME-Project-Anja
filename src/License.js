@@ -43,7 +43,7 @@ var node_1 = require("isomorphic-git/http/node");
 var path = require("path");
 function getLicense(url, repository) {
     return __awaiter(this, void 0, void 0, function () {
-        var cloneDir, files, foundLicense, err_1;
+        var cloneDir, files, foundLicense, foundReadme, Readme, readme, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -69,10 +69,21 @@ function getLicense(url, repository) {
                     _a.sent();
                     files = fs.readdirSync(cloneDir);
                     foundLicense = files.find(function (file) { return /LICENSE(\..*)?$/i.test(file); });
+                    foundReadme = false;
+                    if (foundLicense == undefined) {
+                        Readme = files.find(function (file) { return /README(\..*)?$/i.test(file); });
+                        if (Readme != undefined) {
+                            readme = fs.readFileSync(path.join(cloneDir, Readme), 'utf8');
+                            // look for 'license' in the readme file
+                            if (readme.toLowerCase().includes('license')) {
+                                foundReadme = true;
+                            }
+                        }
+                    }
                     //remove cloned repo
                     fs.rmSync(cloneDir, { recursive: true, force: true });
                     //return if we found the LICENSE file
-                    return [2 /*return*/, foundLicense ? 1 : 0];
+                    return [2 /*return*/, (foundLicense || foundReadme) ? 1 : 0];
                 case 3:
                     err_1 = _a.sent();
                     console.error('Error in cloning or searching for license:', err_1);
