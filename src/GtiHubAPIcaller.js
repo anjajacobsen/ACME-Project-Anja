@@ -157,8 +157,19 @@ function getNpmPackageGithubRepo(packageName) {
                     // Check if the repository field exists and is a GitHub repository
                     if (packageData.repository && packageData.repository.url) {
                         repoUrl = packageData.repository.url;
+                        // console.log('***PACKAGE URL RETURN: ' + repoUrl);
+                        // Convert SSH to HTTPS
+                        if (repoUrl.startsWith('git+ssh://git@')) {
+                            // Convert 'git@github.com:user/repo.git' to 'https://github.com/user/repo'
+                            repoUrl = repoUrl.replace('git+ssh://git@', 'https://').replace('.git', '');
+                        }
+                        else if (repoUrl.startsWith('git+')) {
+                            // Convert 'git@github.com:user/repo.git' to 'https://github.com/user/repo'
+                            repoUrl = repoUrl.replace('git+', '').replace('.git', '');
+                        }
                         // Check if the URL points to GitHub
                         if (repoUrl.includes('github.com')) {
+                            // console.log('HERE IS THE URL HERE IS THE URL: ' + repoUrl);
                             return [2 /*return*/, repoUrl];
                         }
                     }
