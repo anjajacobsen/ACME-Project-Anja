@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.processPackageData = processPackageData;
 //got above line from ChatGPT REF: [1]
 var fs = require("fs");
 //get the mode from ./run {input}
@@ -48,6 +49,7 @@ var urls = url_file.split('\n'); //split the urls up
 // import fetch/print functions and interfaces
 var GtiHubAPIcaller_1 = require("./GtiHubAPIcaller");
 var License_1 = require("./License");
+// Get the GitHub repository URL for a given NPM package
 function processPackageData(packageName) {
     return __awaiter(this, void 0, void 0, function () {
         var githubRepo;
@@ -57,11 +59,15 @@ function processPackageData(packageName) {
                 case 1:
                     githubRepo = _a.sent();
                     if (githubRepo) {
-                        console.log("GitHub Repository for ".concat(packageName, ": ").concat(githubRepo));
-                        // Now you can use this URL to make further GitHub API calls if needed
+                        // console.log(`GitHub Repository for ${packageName}: ${githubRepo}`);
+                        // Return the GitHub repository URL
+                        return [2 /*return*/, githubRepo];
                     }
                     else {
                         console.log("No GitHub repository found for ".concat(packageName));
+                        // exit(1);
+                        //**LOGGING - we need better log here
+                        return [2 /*return*/, ""];
                     }
                     return [2 /*return*/];
             }
@@ -143,45 +149,48 @@ function calculateResponsiveMaintainerScore(issues) {
     return Math.round(responsiveMaintainer * 100) / 100;
 }
 var _loop_1 = function (i) {
-    var link_split = urls[i].split("/"); //splits each url into different parts
-    var owner;
-    var repository;
-    owner = "";
-    repository = "";
-    if (link_split[2] === "github.com") { //if its github we can just use owner repository from url
-        owner = link_split[3];
-        // repository = link_split[4];
-        repository = link_split[4].replace(".git", "");
-    }
-    // ** STILL NEEDS TO BE FIXED **
-    else if (link_split[2] === "www.npmjs.com") {
-        //whatever our get link for npm will be (hard coding with working test case for now)
-        //owner = "browserify";
-        //repository = "browserify";
-        processPackageData('browserify');
-    }
-    else {
-        console.log("error");
-    }
     // Non-API metric calculations
     // const foundLicense : number = getLicense(urls[i], repository); // get the license for the repo
     (function () { return __awaiter(void 0, void 0, void 0, function () {
-        var foundLicense, repoInfo, repoIssues, repoUsers, busFactor, correctness, rampUp, responsiveMaintainer, error_1;
+        var link_split, owner, repository, githubRepoOut, link_split_npm, foundLicense, repoInfo, repoIssues, repoUsers, busFactor, correctness, rampUp, responsiveMaintainer, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 5, , 6]);
-                    return [4 /*yield*/, (0, License_1.getLicense)(urls[i], repository)];
+                    _a.trys.push([0, 9, , 10]);
+                    link_split = urls[i].split("/");
+                    owner = void 0;
+                    repository = void 0;
+                    owner = "";
+                    repository = "";
+                    if (!(link_split[2] === "github.com")) return [3 /*break*/, 1];
+                    owner = link_split[3];
+                    // repository = link_split[4];
+                    repository = link_split[4].replace(".git", "");
+                    return [3 /*break*/, 4];
                 case 1:
+                    if (!(link_split[2] === "www.npmjs.com")) return [3 /*break*/, 3];
+                    return [4 /*yield*/, processPackageData(link_split[4])];
+                case 2:
+                    githubRepoOut = _a.sent();
+                    urls[i] = githubRepoOut; //fix for licsense
+                    link_split_npm = githubRepoOut.split("/");
+                    owner = link_split_npm[3];
+                    repository = link_split_npm[4].replace(".git", "");
+                    return [3 /*break*/, 4];
+                case 3:
+                    console.log("error");
+                    _a.label = 4;
+                case 4: return [4 /*yield*/, (0, License_1.getLicense)(urls[i], repository)];
+                case 5:
                     foundLicense = _a.sent();
                     return [4 /*yield*/, (0, GtiHubAPIcaller_1.default)(owner, repository)];
-                case 2:
+                case 6:
                     repoInfo = _a.sent();
                     return [4 /*yield*/, (0, GtiHubAPIcaller_1.fetchRepositoryIssues)(owner, repository)];
-                case 3:
+                case 7:
                     repoIssues = _a.sent();
                     return [4 /*yield*/, (0, GtiHubAPIcaller_1.fetchRepositoryUsers)(owner, repository)];
-                case 4:
+                case 8:
                     repoUsers = _a.sent();
                     busFactor = calculateBusFactorScore(repoUsers);
                     correctness = calculateCorrectness(repoIssues);
@@ -194,12 +203,12 @@ var _loop_1 = function (i) {
                     console.log('Ramp Up:     ', rampUp);
                     console.log('Responsive Maintainer: ', responsiveMaintainer);
                     console.log('License Found: ', foundLicense);
-                    return [3 /*break*/, 6];
-                case 5:
+                    return [3 /*break*/, 10];
+                case 9:
                     error_1 = _a.sent();
                     console.error('Error:', error_1);
-                    return [3 /*break*/, 6];
-                case 6: return [2 /*return*/];
+                    return [3 /*break*/, 10];
+                case 10: return [2 /*return*/];
             }
         });
     }); })();

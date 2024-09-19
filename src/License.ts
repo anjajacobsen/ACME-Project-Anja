@@ -5,6 +5,7 @@ import * as path from 'path';
 
 export async function getLicense(url: string, repository: string): Promise<number> {
     const cloneDir = path.join('./clonedGitRepos', repository);
+    // console.log('***LICENSE URL: ' + url);
 
     try {
         //create the clonedGitRepos folder if there isn't one

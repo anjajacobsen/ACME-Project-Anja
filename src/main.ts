@@ -23,16 +23,21 @@ import fetchRepositoryInfo, { fetchRepositoryUsers, fetchRepositoryIssues,
 import { getLicense } from './License';
 
 // Get the GitHub repository URL for a given NPM package
-async function processPackageData(packageName: string) {
+export async function processPackageData(packageName: string): Promise<string> {
   const githubRepo = await getNpmPackageGithubRepo(packageName);
   
   if (githubRepo) {
-      console.log(`GitHub Repository for ${packageName}: ${githubRepo}`);
-      // Now you can use this URL to make further GitHub API calls if needed
+      // console.log(`GitHub Repository for ${packageName}: ${githubRepo}`);
+      // Return the GitHub repository URL
+      return githubRepo;
   } else {
       console.log(`No GitHub repository found for ${packageName}`);
+      // exit(1);
+      //**LOGGING - we need better log here
+      return "";
   }
 }
+
 
 function calculateBusFactorScore(users: RepositoryUsers): number {
   // get total contributions for each user
@@ -167,31 +172,7 @@ function calculateResponsiveMaintainerScore(issues: RepositoryIssues): number {
 
 //////////////////////////////////////////
 for( let i = 0; i < urls.length; i++){ //loop through all of the urls
-  let link_split = urls[i].split("/"); //splits each url into different parts
-
-
-  let owner : string;
-  let repository : string;
-
-  owner = "";
-  repository = "";
-
-  if( link_split[2] === "github.com" ){ //if its github we can just use owner repository from url
-    owner = link_split[3];
-    // repository = link_split[4];
-    repository = link_split[4].replace(".git", "");
-  }
   
-  // ** STILL NEEDS TO BE FIXED **
-  else if( link_split[2] === "www.npmjs.com" ){
-    //whatever our get link for npm will be (hard coding with working test case for now)
-    //owner = "browserify";
-    //repository = "browserify";
-    processPackageData('browserify');
-  }
-  else{
-    console.log("error");
-  }
   
   // Non-API metric calculations
   // const foundLicense : number = getLicense(urls[i], repository); // get the license for the repo
@@ -199,6 +180,40 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
 
   (async () => {
     try {
+
+      //Get data from url
+      let link_split = urls[i].split("/"); //splits each url into different parts
+
+      let owner : string;
+      let repository : string;
+
+      owner = "";
+      repository = "";
+
+      if( link_split[2] === "github.com" ){ //if its github we can just use owner repository from url
+        owner = link_split[3];
+        // repository = link_split[4];
+        repository = link_split[4].replace(".git", "");
+      }
+      
+      // ** STILL NEEDS TO BE FIXED **
+      else if( link_split[2] === "www.npmjs.com" ){
+        //whatever our get link for npm will be (hard coding with working test case for now)
+        const githubRepoOut = await processPackageData(link_split[4]);
+        urls[i] = githubRepoOut; //fix for licsense
+
+        // console.log("****NPM URL: " + githubRepoOut);
+        let link_split_npm = githubRepoOut.split("/"); //splits each url into different parts
+
+        owner = link_split_npm[3];
+        repository = link_split_npm[4].replace(".git", "");
+
+        // console.log('OWNER: ' + owner + '\nREPOSITORY: ' + repository);
+
+      }
+      else{
+        console.log("error");
+      }
       //get non-api metrics
       const foundLicense: number = await getLicense(urls[i], repository);
 
