@@ -26,12 +26,24 @@ export async function getLicense(url: string, repository: string): Promise<numbe
         //search for LICENSE file
         const files = fs.readdirSync(cloneDir);
         const foundLicense = files.find(file => /LICENSE(\..*)?$/i.test(file));
+        let foundReadme : boolean = false; 
+        if (foundLicense == undefined) {
+            const Readme = files.find(file => /README(\..*)?$/i.test(file));
+            if (Readme != undefined) {
+                // Read the contents of the README file
+                const readme = fs.readFileSync(path.join(cloneDir, Readme), 'utf8');
+                // look for 'license' in the readme file
+                if (readme.toLowerCase().includes('license')) {
+                    foundReadme = true;
+                }
+            } 
+        }
 
         //remove cloned repo
         fs.rmSync(cloneDir, { recursive: true, force: true });
 
         //return if we found the LICENSE file
-        return foundLicense ? 1 : 0;
+        return (foundLicense || foundReadme) ? 1 : 0;
 
     } catch (err) { //error case
         console.error('Error in cloning or searching for license:', err);
