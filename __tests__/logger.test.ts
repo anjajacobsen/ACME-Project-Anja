@@ -8,9 +8,6 @@ test('Logger should log "Logger is working"', () => {
   logSpy.mockRestore(); //restore original method after test
 });
 
-
-  
-
 //Test input validation:
 //-Non-valid file path
 //-multi-arguments (not 100% sure how they want us to handle this)
