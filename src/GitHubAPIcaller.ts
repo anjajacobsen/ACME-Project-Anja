@@ -204,38 +204,32 @@ export async function fetchRepositoryUsers(owner: string, name: string): Promise
  */
 export async function getNpmPackageGithubRepo(packageName: string): Promise<string | null> {
   try {
-      // Fetch the package metadata from the NPM registry
       const response = await axios.get(`https://registry.npmjs.org/${packageName}`);
       const packageData = response.data;
 
-      // Check if the repository field exists and is a GitHub repository
       if (packageData.repository && packageData.repository.url) {
           let repoUrl = packageData.repository.url;
-          // console.log('***PACKAGE URL RETURN: ' + repoUrl);
 
-          // Convert SSH to HTTPS
           if (repoUrl.startsWith('git+ssh://git@')) {
-            // Convert 'git@github.com:user/repo.git' to 'https://github.com/user/repo'
-            repoUrl = repoUrl.replace('git+ssh://git@', 'https://').replace('.git', '');
-          }
-          else if (repoUrl.startsWith('git+')) {
-            // Convert 'git@github.com:user/repo.git' to 'https://github.com/user/repo'
-            repoUrl = repoUrl.replace('git+', '').replace('.git', '');
+              repoUrl = repoUrl.replace('git+ssh://git@', 'https://').replace('.git', '');
+          } else if (repoUrl.startsWith('git+')) {
+              repoUrl = repoUrl.replace('git+', '').replace('.git', '');
+          } else {
+              repoUrl = repoUrl.replace('.git', ''); // Always remove `.git` suffix
           }
 
-          // Check if the URL points to GitHub
           if (repoUrl.includes('github.com')) {
-              // console.log('HERE IS THE URL HERE IS THE URL: ' + repoUrl);
               return repoUrl;
           }
       }
 
-      return null; // Return null if no valid GitHub repository is found
+      return null;
   } catch (error) {
       console.error(`Failed to fetch NPM package data for ${packageName}:`, error);
       return null;
   }
 }
+
 
 
 
