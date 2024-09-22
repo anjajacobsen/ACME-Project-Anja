@@ -1,0 +1,15 @@
+{
+  "URL": "https://github.com/cloudinary_npm",
+  "NetScore": 0.67,
+  "NetScore_Latency": 8.56,
+  "RampUp": 0.2,
+  "RampUp_Latency": 0,
+  "Correctness": 0.96,
+  "Correctness_Latency": 0.006,
+  "BusFactor": 0.2,
+  "BusFactor_Latency": 0,
+  "ResponsiveMaintainer": 0.75,
+  "ResponsiveMaintainer_Latency": 0,
+  "License": 1,
+  "License_Latency": 5.813
+}
