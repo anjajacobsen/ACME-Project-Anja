@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -37,54 +37,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateFilePath = validateFilePath;
-exports.validateFileContent = validateFileContent;
 exports.processPackageData = processPackageData;
+//got above line from ChatGPT REF: [1]
 var fs = require("fs");
-var path = require("path");
-var logger_1 = require("./logger");
-// Get the mode from ./run {input}
-var input_args = process.argv.slice(2); // gets user arguments passed in from run bash script
-var filepath = input_args.length > 0 ? input_args[0] : "test.txt"; // default to "test.txt" if no argument
-// Declare urls in the outer scope so it's accessible throughout the script
-var urls = [];
-// Exported functions for file validation
-function validateFilePath(filepath) {
-    // Check if the file exists
-    if (!fs.existsSync(filepath)) {
-        logger_1.default.error("File not found: ".concat(filepath));
-        throw new Error("Invalid file path: ".concat(filepath));
-    }
-    // Check if the file has the correct .txt extension
-    if (path.extname(filepath) !== '.txt') {
-        logger_1.default.error("File is not a .txt file: ".concat(filepath));
-        throw new Error("Only .txt files are allowed: ".concat(filepath));
-    }
-}
-function validateFileContent(urls) {
-    var urlRegex = /^(https:\/\/github\.com\/|https:\/\/www\.npmjs\.com\/)/;
-    for (var _i = 0, urls_1 = urls; _i < urls_1.length; _i++) {
-        var url = urls_1[_i];
-        if (url.trim() !== '' && !urlRegex.test(url)) {
-            logger_1.default.error("Invalid URL found in file: ".concat(url));
-            throw new Error("File contains invalid URLs: ".concat(url));
-        }
-    }
-}
-// Run validation
-try {
-    validateFilePath(filepath); // Validate the file path
-    // Read the URLs from the given filepath
-    var url_file = fs.readFileSync(filepath, 'utf-8'); // import file
-    urls = url_file.split('\n').map(function (url) { return url.trim(); }); // split and trim the urls
-    validateFileContent(urls); // Validate file content
-    logger_1.default.info('File validation passed');
-}
-catch (error) {
-    var err = error;
-    logger_1.default.error("Invalid file detected: ".concat(filepath, ". Reason: ").concat(err.message));
-    process.exit(1); // Exit with error status
-}
+//get the mode from ./run {input}
+var input_args = process.argv.slice(2); //gets user arguments pass in from run bash script REF: [2]
+var filepath = input_args.length > 0 ? input_args[0] : "test"; //if no mode is passed in, default to test
+//read the urls from the given filepath REF: [3]
+var url_file = fs.readFileSync(filepath, 'utf-8'); //import file
+var urls = url_file.split('\n'); //split the urls up
 // import fetch/print functions and interfaces
 var CalculateMetrics_1 = require("./CalculateMetrics");
 var GitHubAPIcaller_1 = require("./GitHubAPIcaller");

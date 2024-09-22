@@ -30,7 +30,10 @@ if [ "$1" == "install" ]; then
 
     npm i --save-dev @types/jest > /dev/null 2>&1
 
-    echo "8 dependencies installed..."
+    npm install --save-dev @types/winston > /dev/null 2>&1
+
+
+    echo "9 dependencies installed..."
 
     exit 0
 fi
@@ -38,7 +41,7 @@ fi
 #test option to run our testing file
 if [ "$1" == "test" ]; then
     # Run Jest tests but suppress the output to /dev/null
-    npx jest --coverage --json --outputFile=coverage/testResults.json > /dev/null 2>&1
+    npx jest --coverage --json --outputFile=coverage/testResults.json 
     # Compile the coverageReport.ts file to JavaScript using tsc
     npx tsc ./src/coverageReport.ts
     # Run the compiled JavaScript file (coverageReport.js) to print only the necessary output

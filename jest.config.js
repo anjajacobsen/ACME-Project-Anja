@@ -3,9 +3,10 @@ module.exports = {
   testEnvironment: 'node',
   collectCoverage: true,
   collectCoverageFrom: [
-    "src/*.ts",           
-    "!src/coverageReport.ts" 
+    "src/*.ts",
+    "!src/coverageReport.ts",
   ],
-  coverageDirectory: "coverage", 
-  coverageReporters: ["json-summary", "text"],
+  testMatch: ["**/__tests__/**/*.test.ts"],
+  coverageDirectory: "coverage",
+  coverageReporters: ["json-summary", "text", "lcov"],
 };
