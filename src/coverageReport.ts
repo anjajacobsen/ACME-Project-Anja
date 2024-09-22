@@ -50,9 +50,7 @@ const totalTestSuites = testResults.testResults.length;
 const passedTestSuites = testResults.testResults.filter(suite => suite.numFailingTests === 0).length;
 
 // Output the formatted result
-console.log(`Total Test Suites: ${totalTestSuites}`);
-console.log(`Passed Test Suites: ${passedTestSuites}`);
-console.log(`Total Test Cases: ${totalTests}`);
+console.log(`Total Test Cases: ${totalTestSuites}`);
 console.log(`Passed Test Cases: ${passedTests}`);
 console.log(`Coverage: ${coveragePercent}%`);
-console.log(`${passedTests}/${totalTests} test cases passed. ${coveragePercent}% line coverage achieved.`);
+console.log(`${passedTests}/${totalTestSuites} test cases passed. ${coveragePercent}% line coverage achieved.`);
