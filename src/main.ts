@@ -5,9 +5,28 @@ import * as fs from 'fs';
 // import logger
 import logger from './logger'; 
 
+const logFile = process.env.LOG_FILE;
+const githubToken = process.env.GITHUB_TOKEN;
+
+// Exit with an error code if the required environment variables are not set
+if (!logFile || !githubToken) {
+  logger.error("Error: LOG_FILE or GITHUB_TOKEN environment variable is not set.");
+  process.exit(1); // Exit unsuccessfully
+}
+
 //get the mode from ./run {input}
 let input_args: string[] = process.argv.slice(2); //gets user arguments pass in from run bash script REF: [2]
 let filepath: string = input_args.length > 0 ? input_args[0] : "test"; //if no mode is passed in, default to test
+
+// Read the URLs from the given filepath
+// Read the URLs from the given filepath
+const url_file = fs.readFileSync(filepath, 'utf-8'); // Import file
+
+// Split the URLs, trim whitespace, and filter out any empty lines
+const urls = url_file
+  .split('\n')
+  .map(url => url.trim())
+  .filter(url => url.length > 0); // Filter out blank lines
 
 //read the urls from the given filepath REF: [3]
 const url_file = fs.readFileSync(filepath, 'utf-8'); //import file
@@ -172,23 +191,15 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
       // console.log('License Found: ', foundLicense);
       // console.log('License Latency: ', foundLicenseLatency);
 
-      const repositoryMetrics: RepositoryMetrics = {
-        URL: urls[i],
-        NetScore: netScore,
-        NetScore_Latency: Number(netScoreLatency),
-        RampUp: busFactor,
-        RampUp_Latency: Number(rampUpLatency),
-        Correctness: correctness,
-        Correctness_Latency: 0.006,
-        BusFactor: busFactor,
-        BusFactor_Latency: Number(busFactorLatency),
-        ResponsiveMaintainer: responsiveMaintainer,
-        ResponsiveMaintainer_Latency: Number(responsiveMaintainerLatency),
-        License: foundLicense,
-        License_Latency: Number(foundLicenseLatency)
-      };
+    
+      // Assuming each variable is defined correctly for each URL
+      var output_string = `{"URL":"${urls[i]}", "NetScore":${netScore}, "NetScore_Latency": ${netScoreLatency}, "RampUp":${rampUp}, "RampUp_Latency": ${rampUpLatency}, "Correctness":${correctness}, "Correctness_Latency":${correctnessLatency}, "BusFactor":${busFactor}, "BusFactor_Latency": ${busFactorLatency}, "ResponsiveMaintainer":${responsiveMaintainer}, "ResponsiveMaintainer_Latency": ${responsiveMaintainerLatency}, "License":${foundLicense}, "License_Latency": ${foundLicenseLatency}}`;
+      
+      // Only write the JSON object followed by a newline
+      process.stdout.write(output_string + '\n');
 
-      console.log(repositoryMetrics);
+    
+      
 
   } 
   catch (error) {

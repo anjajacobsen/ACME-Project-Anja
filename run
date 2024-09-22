@@ -26,7 +26,7 @@ if [ "$1" == "install" ]; then
 
     npm install jest > /dev/null 2>&1
 
-    # sudo apt install jest
+    npm install --save-dev jest@29.7.0 > /dev/null 2>&1
 
     npm i --save-dev @types/jest > /dev/null 2>&1
 
@@ -41,7 +41,8 @@ fi
 #test option to run our testing file
 if [ "$1" == "test" ]; then
     # Run Jest tests but suppress the output to /dev/null
-    npx jest --coverage --json --outputFile=coverage/testResults.json 
+    npx jest --coverage --json --outputFile=coverage/testResults.json > /dev/null 2>&1
+
     # Compile the coverageReport.ts file to JavaScript using tsc
     npx tsc ./src/coverageReport.ts
     # Run the compiled JavaScript file (coverageReport.js) to print only the necessary output
@@ -54,7 +55,11 @@ fi
 if [ -n "$1" ]; then
     npx tsc ./src/main.ts
     node ./src/main.js "$1"
-    exit 0
+    # Capture the exit code of the Node.js process
+    NODE_EXIT_CODE=$?
+
+    # Exit with the same code as the Node.js process
+    exit $NODE_EXIT_CODE
 fi
 
 #if no argument is passed, exit 1 for error and print message

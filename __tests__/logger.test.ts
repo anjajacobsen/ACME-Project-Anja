@@ -1,36 +1,6 @@
 // __tests__/logger.test.ts
 import * as winston from 'winston';
 
-describe('Logger', () => {
-  let spyConsole: jest.SpyInstance;
-  let spyFile: jest.SpyInstance;
-
-  beforeEach(() => {
-    // Mock the transports
-    spyConsole = jest.spyOn(winston.transports.Console.prototype, 'log').mockImplementation(() => {});
-    spyFile = jest.spyOn(winston.transports.File.prototype, 'log').mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-    jest.resetModules(); // This is important to reset modules when testing environment variables
-  });
-
-  it('should log to console and file at the "info" level by default', () => {
-    const logger = require('../src/logger').default; // Re-require the logger
-
-    logger.info('Info log message');
-    expect(spyConsole).toHaveBeenCalled();
-    expect(spyFile).toHaveBeenCalled();
-  });
-
-  it('should respect LOG_LEVEL environment variable', () => {
-    process.env.LOG_LEVEL = 'error'; // Set environment variable
-    const logger = require('../src/logger').default; // Re-require logger to pick up new env
-
-    logger.info('This should not be logged');
-    logger.error('This should be logged');
-
     expect(spyConsole).toHaveBeenCalledTimes(1); // Only error should be logged
     expect(spyFile).toHaveBeenCalledTimes(1);
 

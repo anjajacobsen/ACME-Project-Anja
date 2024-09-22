@@ -39,7 +39,9 @@ const testResults: TestResults = readJSON<TestResults>(testResultsPath);
 // Calculate coverage percentage
 const totalLines = coverageSummary.total.lines.total;
 const coveredLines = coverageSummary.total.lines.covered;
+
 const coveragePercent = ((coveredLines / totalLines) * 100).toFixed(0);
+
 
 // Get the total and passed test cases
 const totalTests = testResults.numTotalTests;
