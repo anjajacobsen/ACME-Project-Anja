@@ -3,6 +3,8 @@
     "outDir": "./dist", //output directory for compiled files
     "rootDir": "./src", //source direcroty for typescript files
     "moduleResolution": "node", //use Node.js module resolution
+    "esModuleInterop" : true,
+    "types": ["jest"],
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
     /* Projects */
