@@ -79,7 +79,7 @@ var _loop_1 = function (i) {
     // Non-API metric calculations
     // const foundLicense : number = getLicense(urls[i], repository); // get the license for the repo
     (function () { return __awaiter(void 0, void 0, void 0, function () {
-        var link_split, owner, repository, githubRepoOut, link_split_npm, foundLicense, repoInfo, repoIssues, repoUsers, busFactor, correctness, rampUp, responsiveMaintainer, netScore, error_1;
+        var link_split, owner, repository, githubRepoOut, link_split_npm, start, end, netScoreStart, netScoreEnd, foundLicense, foundLicenseLatency, repoInfo, repoIssues, repoUsers, busFactor, busFactorLatency, correctness, correctnessLatency, rampUp, rampUpLatency, responsiveMaintainer, responsiveMaintainerLatency, netScore, netScoreLatency, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -107,9 +107,19 @@ var _loop_1 = function (i) {
                 case 3:
                     console.log("error");
                     _a.label = 4;
-                case 4: return [4 /*yield*/, (0, License_1.getLicense)(urls[i], repository)];
+                case 4:
+                    start = void 0;
+                    end = void 0;
+                    netScoreStart = void 0;
+                    netScoreEnd = void 0;
+                    netScoreStart = performance.now();
+                    //get non-api metrics
+                    start = performance.now();
+                    return [4 /*yield*/, (0, License_1.getLicense)(urls[i], repository)];
                 case 5:
                     foundLicense = _a.sent();
+                    end = performance.now();
+                    foundLicenseLatency = ((end - start) / 1000).toFixed(3);
                     return [4 /*yield*/, (0, GitHubAPIcaller_1.default)(owner, repository)];
                 case 6:
                     repoInfo = _a.sent();
@@ -119,19 +129,44 @@ var _loop_1 = function (i) {
                     return [4 /*yield*/, (0, GitHubAPIcaller_1.fetchRepositoryUsers)(owner, repository)];
                 case 8:
                     repoUsers = _a.sent();
+                    // API metric calculations
+                    //bus factor
+                    start = performance.now();
                     busFactor = (0, CalculateMetrics_1.calculateBusFactorScore)(repoUsers);
+                    end = performance.now();
+                    busFactorLatency = ((end - start) / 1000).toFixed(3);
+                    //correctness
+                    start = performance.now();
                     correctness = (0, CalculateMetrics_1.calculateCorrectness)(repoIssues);
+                    end = performance.now();
+                    correctnessLatency = ((end - start) / 1000).toFixed(3);
+                    //ramp up
+                    start = performance.now();
                     rampUp = (0, CalculateMetrics_1.calculateRampUpScore)(repoUsers);
+                    end = performance.now();
+                    rampUpLatency = ((end - start) / 1000).toFixed(3);
+                    //responsive maintainer
+                    start = performance.now();
                     responsiveMaintainer = (0, CalculateMetrics_1.calculateResponsiveMaintainerScore)(repoIssues);
+                    end = performance.now();
+                    responsiveMaintainerLatency = ((end - start) / 1000).toFixed(3);
                     netScore = (0, CalculateMetrics_1.default)(busFactor, correctness, responsiveMaintainer, rampUp, foundLicense);
-                    console.log('NetScore:     ', netScore);
+                    netScoreEnd = performance.now();
+                    netScoreLatency = ((netScoreEnd - netScoreStart) / 1000).toFixed(3);
                     // print out scores (for testing)
                     console.log('Repository:  ', repository);
+                    console.log('NetScore:     ', netScore);
+                    console.log('NetScore Latency:     ', netScoreLatency);
                     console.log('Bus Factor:  ', busFactor);
+                    console.log('Bus Factor Latency:  ', busFactorLatency);
                     console.log('Correctness: ', correctness);
+                    console.log('Correctness Latency: ', correctnessLatency);
                     console.log('Ramp Up:     ', rampUp);
+                    console.log('Ramp Up Latency:     ', rampUpLatency);
                     console.log('Responsive Maintainer: ', responsiveMaintainer);
+                    console.log('Responsive Maintainer Latency: ', responsiveMaintainerLatency);
                     console.log('License Found: ', foundLicense);
+                    console.log('License Latency: ', foundLicenseLatency);
                     return [3 /*break*/, 10];
                 case 9:
                     error_1 = _a.sent();

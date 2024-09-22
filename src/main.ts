@@ -117,31 +117,74 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
       else{
         console.log("error");
       }
+      
+      //variables for latency calculations
+      let start : number;
+      let end : number;
+
+      let netScoreStart : number;
+      let netScoreEnd : number;
+
+      netScoreStart = performance.now();
+
       //get non-api metrics
+      start = performance.now();
       const foundLicense: number = await getLicense(urls[i], repository);
+      end = performance.now();
+      const foundLicenseLatency = ((end - start) / 1000).toFixed(3);
 
       // get inferfaces to get all metrics for repository information
       const repoInfo:   RepositoryInfo   = await fetchRepositoryInfo(owner, repository);
       const repoIssues: RepositoryIssues = await fetchRepositoryIssues(owner, repository);
       const repoUsers:  RepositoryUsers  = await fetchRepositoryUsers(owner, repository);
-      
-      // API metric calculations
-      const busFactor           = calculateBusFactorScore(repoUsers);
-      const correctness         = calculateCorrectness(repoIssues);
-      const rampUp              = calculateRampUpScore(repoUsers);
-      const responsiveMaintainer = calculateResponsiveMaintainerScore(repoIssues);
 
+      // API metric calculations
+      //bus factor
+      start = performance.now();
+      const busFactor           = calculateBusFactorScore(repoUsers);
+      end = performance.now();
+      const busFactorLatency    = ((end - start) / 1000).toFixed(3);
+      
+      //correctness
+      start = performance.now();
+      const correctness         = calculateCorrectness(repoIssues);
+      end = performance.now();
+      const correctnessLatency  = ((end - start) / 1000).toFixed(3);
+
+      //ramp up
+      start = performance.now();
+      const rampUp              = calculateRampUpScore(repoUsers);
+      end = performance.now();
+      const rampUpLatency       = ((end - start) / 1000).toFixed(3);
+
+      //responsive maintainer
+      start = performance.now();
+      const responsiveMaintainer = calculateResponsiveMaintainerScore(repoIssues);
+      end = performance.now();
+      const responsiveMaintainerLatency = ((end - start) / 1000).toFixed(3);
+
+      //net score
       const netScore = calculateNetScore(busFactor, correctness, responsiveMaintainer, rampUp, foundLicense);
-      console.log('NetScore:     ', netScore);
+
+      netScoreEnd = performance.now();
+
+      const netScoreLatency = ((netScoreEnd - netScoreStart) / 1000).toFixed(3);
 
 
       // print out scores (for testing)
       console.log('Repository:  ', repository);
+      console.log('NetScore:     ', netScore);
+      console.log('NetScore Latency:     ', netScoreLatency);
       console.log('Bus Factor:  ', busFactor);
+      console.log('Bus Factor Latency:  ', busFactorLatency);
       console.log('Correctness: ', correctness);
+      console.log('Correctness Latency: ', correctnessLatency);
       console.log('Ramp Up:     ', rampUp);
+      console.log('Ramp Up Latency:     ', rampUpLatency);
       console.log('Responsive Maintainer: ', responsiveMaintainer);
+      console.log('Responsive Maintainer Latency: ', responsiveMaintainerLatency);
       console.log('License Found: ', foundLicense);
+      console.log('License Latency: ', foundLicenseLatency);
   } 
   catch (error) {
     console.error('Error:', error); 
