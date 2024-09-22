@@ -41,9 +41,11 @@ var fs = require("fs");
 var git = require("isomorphic-git");
 var node_1 = require("isomorphic-git/http/node");
 var path = require("path");
+// List of licenses compatible with LGPLv2.1
+var compatibleLicenses = ["MIT", "BSD-2-Clause", "BSD-3-Clause", "Apache-2.0", "MPL-2.0"];
 function getLicense(url, repository) {
     return __awaiter(this, void 0, void 0, function () {
-        var cloneDir, files, foundLicense, foundReadme, Readme, readme, err_1;
+        var cloneDir, files, foundLicense, foundReadme, licenseType, licenseContent, Readme, readme, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -51,11 +53,11 @@ function getLicense(url, repository) {
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    //create the clonedGitRepos folder if there isn't one
+                    // Create the clonedGitRepos folder if it doesn't exist
                     if (!fs.existsSync('./clonedGitRepos')) {
                         fs.mkdirSync('./clonedGitRepos', { recursive: true });
                     }
-                    //clone the repos using depth=1 (so we only get the most recent commit)
+                    // Clone the repository with depth=1 to get only the most recent commit
                     return [4 /*yield*/, git.clone({
                             fs: fs,
                             http: node_1.default,
@@ -65,31 +67,67 @@ function getLicense(url, repository) {
                             depth: 1
                         })];
                 case 2:
-                    //clone the repos using depth=1 (so we only get the most recent commit)
+                    // Clone the repository with depth=1 to get only the most recent commit
                     _a.sent();
                     files = fs.readdirSync(cloneDir);
                     foundLicense = files.find(function (file) { return /LICENSE(\..*)?$/i.test(file); });
                     foundReadme = false;
-                    if (foundLicense == undefined) {
+                    licenseType = null;
+                    if (foundLicense != undefined) {
+                        licenseContent = fs.readFileSync(path.join(cloneDir, foundLicense), 'utf8');
+                        licenseType = identifyLicenseType(licenseContent); // Function to identify license type
+                    }
+                    else {
                         Readme = files.find(function (file) { return /README(\..*)?$/i.test(file); });
                         if (Readme != undefined) {
                             readme = fs.readFileSync(path.join(cloneDir, Readme), 'utf8');
-                            // look for 'license' in the readme file
+                            // Look for 'license' in the README file
                             if (readme.toLowerCase().includes('license')) {
                                 foundReadme = true;
+                                licenseType = identifyLicenseType(readme); // Function to identify license type
                             }
                         }
                     }
-                    //remove cloned repo
+                    // Remove cloned repo
                     fs.rmSync(cloneDir, { recursive: true, force: true });
-                    //return if we found the LICENSE file
-                    return [2 /*return*/, (foundLicense || foundReadme) ? 1 : 0];
+                    // Check if the identified license is compatible with LGPLv2.1
+                    if (licenseType && compatibleLicenses.includes(licenseType)) {
+                        return [2 /*return*/, 1]; // License is compatible
+                    }
+                    else if (foundLicense || foundReadme) {
+                        return [2 /*return*/, 0]; // License found but not compatible
+                    }
+                    else {
+                        return [2 /*return*/, -1]; // License not found
+                    }
+                    return [3 /*break*/, 4];
                 case 3:
                     err_1 = _a.sent();
                     console.error('Error in cloning or searching for license:', err_1);
-                    return [2 /*return*/, 0];
+                    return [2 /*return*/, -1];
                 case 4: return [2 /*return*/];
             }
         });
     });
+}
+// Identify the license type based on the content
+function identifyLicenseType(content) {
+    if (content.includes("MIT License")) {
+        return "MIT";
+    }
+    else if (content.includes("BSD-2-Clause")) {
+        return "BSD-2-Clause";
+    }
+    else if (content.includes("BSD-3-Clause")) {
+        return "BSD-3-Clause";
+    }
+    else if (content.includes("Apache License")) {
+        return "Apache-2.0";
+    }
+    else if (content.includes("Mozilla Public License")) {
+        return "MPL-2.0";
+    }
+    else {
+        return null; // License type not identified
+    }
 }
