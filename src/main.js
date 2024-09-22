@@ -40,12 +40,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.processPackageData = processPackageData;
 //got above line from ChatGPT REF: [1]
 var fs = require("fs");
+// import logger
+var logger_1 = require("./logger");
+var logFile = process.env.LOG_FILE;
+var githubToken = process.env.GITHUB_TOKEN;
+// Exit with an error code if the required environment variables are not set
+if (logFile == "" || githubToken == "") {
+    logger_1.default.error("Error: LOG_FILE or GITHUB_TOKEN environment variable is not set.");
+    process.exit(1); // Exit unsuccessfully
+}
 //get the mode from ./run {input}
 var input_args = process.argv.slice(2); //gets user arguments pass in from run bash script REF: [2]
 var filepath = input_args.length > 0 ? input_args[0] : "test"; //if no mode is passed in, default to test
-//read the urls from the given filepath REF: [3]
-var url_file = fs.readFileSync(filepath, 'utf-8'); //import file
-var urls = url_file.split('\n'); //split the urls up
+// Read the URLs from the given filepath
+var url_file = fs.readFileSync(filepath, 'utf-8'); // Import file
+// Split the URLs, trim whitespace, and filter out any empty lines
+var urls = url_file
+    .split('\n')
+    .map(function (url) { return url.trim(); })
+    .filter(function (url) { return url.length > 0; }); // Filter out blank lines
 // import fetch/print functions and interfaces
 var CalculateMetrics_1 = require("./CalculateMetrics");
 var GitHubAPIcaller_1 = require("./GitHubAPIcaller");
@@ -79,7 +92,7 @@ var _loop_1 = function (i) {
     // Non-API metric calculations
     // const foundLicense : number = getLicense(urls[i], repository); // get the license for the repo
     (function () { return __awaiter(void 0, void 0, void 0, function () {
-        var link_split, owner, repository, githubRepoOut, link_split_npm, start, end, netScoreStart, netScoreEnd, foundLicense, foundLicenseLatency, repoInfo, repoIssues, repoUsers, busFactor, busFactorLatency, correctness, correctnessLatency, rampUp, rampUpLatency, responsiveMaintainer, responsiveMaintainerLatency, netScore, netScoreLatency, repositoryMetrics, error_1;
+        var link_split, owner, repository, githubRepoOut, link_split_npm, start, end, netScoreStart, netScoreEnd, foundLicense, foundLicenseLatency, repoInfo, repoIssues, repoUsers, busFactor, busFactorLatency, correctness, correctnessLatency, rampUp, rampUpLatency, responsiveMaintainer, responsiveMaintainerLatency, netScore, netScoreLatency, output_string, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -153,22 +166,9 @@ var _loop_1 = function (i) {
                     netScore = (0, CalculateMetrics_1.default)(busFactor, correctness, responsiveMaintainer, rampUp, foundLicense);
                     netScoreEnd = performance.now();
                     netScoreLatency = ((netScoreEnd - netScoreStart) / 1000).toFixed(3);
-                    repositoryMetrics = {
-                        URL: urls[i],
-                        NetScore: netScore,
-                        NetScore_Latency: Number(netScoreLatency),
-                        RampUp: busFactor,
-                        RampUp_Latency: Number(rampUpLatency),
-                        Correctness: correctness,
-                        Correctness_Latency: 0.006,
-                        BusFactor: busFactor,
-                        BusFactor_Latency: Number(busFactorLatency),
-                        ResponsiveMaintainer: responsiveMaintainer,
-                        ResponsiveMaintainer_Latency: Number(responsiveMaintainerLatency),
-                        License: foundLicense,
-                        License_Latency: Number(foundLicenseLatency)
-                    };
-                    console.log(repositoryMetrics);
+                    output_string = "{\"URL\":\"".concat(urls[i], "\", \"NetScore\":").concat(netScore, ", \"NetScore_Latency\": ").concat(netScoreLatency, ", \"RampUp\":").concat(rampUp, ", \"RampUp_Latency\": ").concat(rampUpLatency, ", \"Correctness\":").concat(correctness, ", \"Correctness_Latency\":").concat(correctnessLatency, ", \"BusFactor\":").concat(busFactor, ", \"BusFactor_Latency\": ").concat(busFactorLatency, ", \"ResponsiveMaintainer\":").concat(responsiveMaintainer, ", \"ResponsiveMaintainer_Latency\": ").concat(responsiveMaintainerLatency, ", \"License\":").concat(foundLicense, ", \"License_Latency\": ").concat(foundLicenseLatency, "}");
+                    // Only write the JSON object followed by a newline
+                    process.stdout.write(output_string + '\n');
                     return [3 /*break*/, 10];
                 case 9:
                     error_1 = _a.sent();

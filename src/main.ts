@@ -9,7 +9,7 @@ const logFile = process.env.LOG_FILE;
 const githubToken = process.env.GITHUB_TOKEN;
 
 // Exit with an error code if the required environment variables are not set
-if (!logFile || !githubToken) {
+if (logFile == "" || githubToken == "") {
   logger.error("Error: LOG_FILE or GITHUB_TOKEN environment variable is not set.");
   process.exit(1); // Exit unsuccessfully
 }
@@ -19,7 +19,6 @@ let input_args: string[] = process.argv.slice(2); //gets user arguments pass in 
 let filepath: string = input_args.length > 0 ? input_args[0] : "test"; //if no mode is passed in, default to test
 
 // Read the URLs from the given filepath
-// Read the URLs from the given filepath
 const url_file = fs.readFileSync(filepath, 'utf-8'); // Import file
 
 // Split the URLs, trim whitespace, and filter out any empty lines
@@ -28,9 +27,7 @@ const urls = url_file
   .map(url => url.trim())
   .filter(url => url.length > 0); // Filter out blank lines
 
-//read the urls from the given filepath REF: [3]
-const url_file = fs.readFileSync(filepath, 'utf-8'); //import file
-const urls = url_file.split('\n'); //split the urls up
+
 
 // import fetch/print functions and interfaces
 import calculateNetScore, { calculateBusFactorScore, calculateCorrectness,
