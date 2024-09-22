@@ -86,7 +86,8 @@ catch (error) {
     process.exit(1); // Exit with error status
 }
 // import fetch/print functions and interfaces
-var GtiHubAPIcaller_1 = require("./GtiHubAPIcaller");
+var CalculateMetrics_1 = require("./CalculateMetrics");
+var GitHubAPIcaller_1 = require("./GitHubAPIcaller");
 var License_1 = require("./License");
 // Get the GitHub repository URL for a given NPM package
 function processPackageData(packageName) {
@@ -94,7 +95,7 @@ function processPackageData(packageName) {
         var githubRepo;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, (0, GtiHubAPIcaller_1.getNpmPackageGithubRepo)(packageName)];
+                case 0: return [4 /*yield*/, (0, GitHubAPIcaller_1.getNpmPackageGithubRepo)(packageName)];
                 case 1:
                     githubRepo = _a.sent();
                     if (githubRepo) {
@@ -113,85 +114,11 @@ function processPackageData(packageName) {
         });
     });
 }
-function calculateBusFactorScore(users) {
-    // get total contributions for each user
-    var contributions = users.data.repository.mentionableUsers.edges.map(function (user) { return user.node.contributionsCollection.contributionCalendar.totalContributions; });
-    // get total contributions by everyone
-    var totalContributions = contributions.reduce(function (acc, val) { return acc + val; }, 0);
-    // total number users
-    var totalUsers = contributions.length;
-    // average contribution per person
-    var averageContribution = totalContributions / totalUsers;
-    // get number of users with contributions >= average contributions per person
-    var aboveAverageContributors = contributions.filter(function (contribution) { return contribution >= averageContribution; }).length;
-    var busFactorScore = aboveAverageContributors / totalUsers;
-    // round to the nearest hundredth
-    return Math.round(busFactorScore * 100) / 100;
-}
-function calculateCorrectness(issues) {
-    var totalIssues = issues.data.repository.issues.totalCount;
-    var completedIssues = issues.data.repository.closedIssues.totalCount;
-    if (totalIssues === 0) {
-        return 1;
-    }
-    var correctness = completedIssues / totalIssues;
-    // round to the nearest hundredth
-    return Math.round(correctness * 100) / 100;
-}
-function calculateRampUpScore(users) {
-    // get first contribution date for each user (from ChatGPT)
-    var firstContributionDates = users.data.repository.mentionableUsers.edges
-        .map(function (user) {
-        var contributionDates = user.node.contributionsCollection.commitContributionsByRepository.flatMap(function (repo) {
-            return repo.contributions.edges.map(function (contribution) { return new Date(contribution.node.occurredAt).getTime(); });
-        });
-        return contributionDates.length ? Math.min.apply(Math, contributionDates) : null;
-    })
-        .filter(function (date) { return date !== null; });
-    // if no valid contribution dates, return 0 as the score.
-    // need at least two contributors to calculate the average
-    if (firstContributionDates.length < 2) {
-        return 0;
-    }
-    // find the time differences between contributors (in weeks) 
-    var timeDifferences = [];
-    for (var i = 1; i < firstContributionDates.length; i++) {
-        var diffInWeeks = (firstContributionDates[i] - firstContributionDates[i - 1]) / (1000 * 3600 * 24 * 7);
-        timeDifferences.push(diffInWeeks);
-    }
-    // find average (in weeks)
-    var averageTimeDifference = timeDifferences.reduce(function (acc, val) { return acc + val; }, 0) / timeDifferences.length;
-    var rampUpScore = 1 / averageTimeDifference;
-    // round to the nearest hundredth
-    return Math.round(rampUpScore * 100) / 100;
-}
-function calculateResponsiveMaintainerScore(issues) {
-    // get date one month ago from today
-    var currentDate = new Date();
-    var oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(currentDate.getMonth() - 1); // set for one month ago
-    // get issue creation and closed dates from past month (from ChatGPT)
-    var recentIssues = issues.data.repository.issues.edges.filter(function (issue) {
-        var createdAt = new Date(issue.node.createdAt);
-        return createdAt >= oneMonthAgo;
-    });
-    // get total number of issues created within the past month
-    var totalIssues = recentIssues.length;
-    // get number of resolved issues within the past month
-    var resolvedIssues = recentIssues.filter(function (issue) { return issue.node.closedAt !== null; }).length;
-    // if no issues were created in the past month
-    if (totalIssues === 0) {
-        return 0;
-    }
-    var responsiveMaintainer = resolvedIssues / totalIssues;
-    // round to the nearest hundredth
-    return Math.round(responsiveMaintainer * 100) / 100;
-}
 var _loop_1 = function (i) {
     // Non-API metric calculations
     // const foundLicense : number = getLicense(urls[i], repository); // get the license for the repo
     (function () { return __awaiter(void 0, void 0, void 0, function () {
-        var link_split, owner, repository, githubRepoOut, link_split_npm, foundLicense, repoInfo, repoIssues, repoUsers, busFactor, correctness, rampUp, responsiveMaintainer, error_1;
+        var link_split, owner, repository, githubRepoOut, link_split_npm, start, end, netScoreStart, netScoreEnd, foundLicense, foundLicenseLatency, repoInfo, repoIssues, repoUsers, busFactor, busFactorLatency, correctness, correctnessLatency, rampUp, rampUpLatency, responsiveMaintainer, responsiveMaintainerLatency, netScore, netScoreLatency, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -219,29 +146,66 @@ var _loop_1 = function (i) {
                 case 3:
                     console.log("error");
                     _a.label = 4;
-                case 4: return [4 /*yield*/, (0, License_1.getLicense)(urls[i], repository)];
+                case 4:
+                    start = void 0;
+                    end = void 0;
+                    netScoreStart = void 0;
+                    netScoreEnd = void 0;
+                    netScoreStart = performance.now();
+                    //get non-api metrics
+                    start = performance.now();
+                    return [4 /*yield*/, (0, License_1.getLicense)(urls[i], repository)];
                 case 5:
                     foundLicense = _a.sent();
-                    return [4 /*yield*/, (0, GtiHubAPIcaller_1.default)(owner, repository)];
+                    end = performance.now();
+                    foundLicenseLatency = ((end - start) / 1000).toFixed(3);
+                    return [4 /*yield*/, (0, GitHubAPIcaller_1.default)(owner, repository)];
                 case 6:
                     repoInfo = _a.sent();
-                    return [4 /*yield*/, (0, GtiHubAPIcaller_1.fetchRepositoryIssues)(owner, repository)];
+                    return [4 /*yield*/, (0, GitHubAPIcaller_1.fetchRepositoryIssues)(owner, repository)];
                 case 7:
                     repoIssues = _a.sent();
-                    return [4 /*yield*/, (0, GtiHubAPIcaller_1.fetchRepositoryUsers)(owner, repository)];
+                    return [4 /*yield*/, (0, GitHubAPIcaller_1.fetchRepositoryUsers)(owner, repository)];
                 case 8:
                     repoUsers = _a.sent();
-                    busFactor = calculateBusFactorScore(repoUsers);
-                    correctness = calculateCorrectness(repoIssues);
-                    rampUp = calculateRampUpScore(repoUsers);
-                    responsiveMaintainer = calculateResponsiveMaintainerScore(repoIssues);
+                    // API metric calculations
+                    //bus factor
+                    start = performance.now();
+                    busFactor = (0, CalculateMetrics_1.calculateBusFactorScore)(repoUsers);
+                    end = performance.now();
+                    busFactorLatency = ((end - start) / 1000).toFixed(3);
+                    //correctness
+                    start = performance.now();
+                    correctness = (0, CalculateMetrics_1.calculateCorrectness)(repoIssues);
+                    end = performance.now();
+                    correctnessLatency = ((end - start) / 1000).toFixed(3);
+                    //ramp up
+                    start = performance.now();
+                    rampUp = (0, CalculateMetrics_1.calculateRampUpScore)(repoUsers);
+                    end = performance.now();
+                    rampUpLatency = ((end - start) / 1000).toFixed(3);
+                    //responsive maintainer
+                    start = performance.now();
+                    responsiveMaintainer = (0, CalculateMetrics_1.calculateResponsiveMaintainerScore)(repoIssues);
+                    end = performance.now();
+                    responsiveMaintainerLatency = ((end - start) / 1000).toFixed(3);
+                    netScore = (0, CalculateMetrics_1.default)(busFactor, correctness, responsiveMaintainer, rampUp, foundLicense);
+                    netScoreEnd = performance.now();
+                    netScoreLatency = ((netScoreEnd - netScoreStart) / 1000).toFixed(3);
                     // print out scores (for testing)
-                    console.log('Repository:   ', repository);
+                    console.log('Repository:  ', repository);
+                    console.log('NetScore:     ', netScore);
+                    console.log('NetScore Latency:     ', netScoreLatency);
                     console.log('Bus Factor:  ', busFactor);
+                    console.log('Bus Factor Latency:  ', busFactorLatency);
                     console.log('Correctness: ', correctness);
+                    console.log('Correctness Latency: ', correctnessLatency);
                     console.log('Ramp Up:     ', rampUp);
+                    console.log('Ramp Up Latency:     ', rampUpLatency);
                     console.log('Responsive Maintainer: ', responsiveMaintainer);
+                    console.log('Responsive Maintainer Latency: ', responsiveMaintainerLatency);
                     console.log('License Found: ', foundLicense);
+                    console.log('License Latency: ', foundLicenseLatency);
                     return [3 /*break*/, 10];
                 case 9:
                     error_1 = _a.sent();

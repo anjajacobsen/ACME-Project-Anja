@@ -56,11 +56,18 @@ try {
 
 
 // import fetch/print functions and interfaces
+import calculateNetScore, { calculateBusFactorScore, calculateCorrectness,
+                            calculateRampUpScore, calculateResponsiveMaintainerScore
+                          } from './CalculateMetrics';
+
+
 import fetchRepositoryInfo, { fetchRepositoryUsers, fetchRepositoryIssues,
                               RepositoryInfo, RepositoryIssues, RepositoryUsers,
-                              printRepositoryUsers, printRepositoryIssues, printRepositoryInfo,
-                              getNpmPackageGithubRepo 
-                            } from './GtiHubAPIcaller';
+                              printRepositoryUsers, printRepositoryIssues, printRepositoryInfo, 
+                              getNpmPackageGithubRepo
+                            } from './GitHubAPIcaller';
+                          
+
 import { getLicense } from './License';
 
 // Get the GitHub repository URL for a given NPM package
@@ -78,110 +85,6 @@ export async function processPackageData(packageName: string): Promise<string> {
       return "";
   }
 }
-
-
-function calculateBusFactorScore(users: RepositoryUsers): number {
-  // get total contributions for each user
-  const contributions = users.data.repository.mentionableUsers.edges.map(
-    (user) => user.node.contributionsCollection.contributionCalendar.totalContributions
-  );
-
-  // get total contributions by everyone
-  const totalContributions = contributions.reduce((acc, val) => acc + val, 0);
-
-  // total number users
-  const totalUsers = contributions.length;
-
-  // average contribution per person
-  const averageContribution = totalContributions / totalUsers;
-
-  // get number of users with contributions >= average contributions per person
-  const aboveAverageContributors = contributions.filter(
-    (contribution) => contribution >= averageContribution
-  ).length;
-
-  const busFactorScore = aboveAverageContributors / totalUsers;
-
-  // round to the nearest hundredth
-  return Math.round(busFactorScore * 100) / 100;
-}
-
-function calculateCorrectness(issues: RepositoryIssues): number {
-  const totalIssues = issues.data.repository.issues.totalCount;
-  const completedIssues = issues.data.repository.closedIssues.totalCount;
-
-  if(totalIssues === 0) {
-    return 1;
-  }
-
-  const correctness = completedIssues / totalIssues;
-
-  // round to the nearest hundredth
-  return Math.round(correctness * 100) / 100;
-}
-
-function calculateRampUpScore(users: RepositoryUsers): number {
-  // get first contribution date for each user (from ChatGPT)
-  const firstContributionDates: number[] = users.data.repository.mentionableUsers.edges
-    .map((user) => {
-      const contributionDates = user.node.contributionsCollection.commitContributionsByRepository.flatMap((repo) =>
-        repo.contributions.edges.map((contribution) => new Date(contribution.node.occurredAt).getTime())
-      );
-      return contributionDates.length ? Math.min(...contributionDates) : null;
-    })
-    .filter((date) => date !== null) as number[];
-
-  // if no valid contribution dates, return 0 as the score.
-  // need at least two contributors to calculate the average
-  if(firstContributionDates.length < 2) {    
-    return 0;
-  }
-
-  // find the time differences between contributors (in weeks) 
-  const timeDifferences: number[] = [];
-  for (let i = 1; i < firstContributionDates.length; i++) {
-    const diffInWeeks = (firstContributionDates[i] - firstContributionDates[i - 1]) / (1000 * 3600 * 24 * 7);
-    timeDifferences.push(diffInWeeks);
-  }
-
-  // find average (in weeks)
-  const averageTimeDifference = timeDifferences.reduce((acc, val) => acc + val, 0) / timeDifferences.length;
-
-  const rampUpScore = 1 / averageTimeDifference;
-
-  // round to the nearest hundredth
-  return Math.round(rampUpScore * 100) / 100;
-}
-
-function calculateResponsiveMaintainerScore(issues: RepositoryIssues): number {
-  // get date one month ago from today
-  const currentDate = new Date();
-  const oneMonthAgo = new Date();
-  oneMonthAgo.setMonth(currentDate.getMonth() - 1); // set for one month ago
-
-  // get issue creation and closed dates from past month (from ChatGPT)
-  const recentIssues = issues.data.repository.issues.edges.filter((issue) => {
-    const createdAt = new Date(issue.node.createdAt);
-    return createdAt >= oneMonthAgo;
-  });
-
-  // get total number of issues created within the past month
-  const totalIssues = recentIssues.length;
-
-  // get number of resolved issues within the past month
-  const resolvedIssues = recentIssues.filter((issue) => issue.node.closedAt !== null).length;
-
-  // if no issues were created in the past month
-  if(totalIssues === 0) {
-    return 0;
-  }
-
-  const responsiveMaintainer = resolvedIssues / totalIssues;
-
-  // round to the nearest hundredth
-  return Math.round(responsiveMaintainer * 100) / 100;
-}
-
 
 /////////////// FOR TESTING //////////////
 
@@ -255,27 +158,74 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
       else{
         console.log("error");
       }
+      
+      //variables for latency calculations
+      let start : number;
+      let end : number;
+
+      let netScoreStart : number;
+      let netScoreEnd : number;
+
+      netScoreStart = performance.now();
+
       //get non-api metrics
+      start = performance.now();
       const foundLicense: number = await getLicense(urls[i], repository);
+      end = performance.now();
+      const foundLicenseLatency = ((end - start) / 1000).toFixed(3);
 
       // get inferfaces to get all metrics for repository information
       const repoInfo:   RepositoryInfo   = await fetchRepositoryInfo(owner, repository);
       const repoIssues: RepositoryIssues = await fetchRepositoryIssues(owner, repository);
       const repoUsers:  RepositoryUsers  = await fetchRepositoryUsers(owner, repository);
-      
+
       // API metric calculations
+      //bus factor
+      start = performance.now();
       const busFactor           = calculateBusFactorScore(repoUsers);
+      end = performance.now();
+      const busFactorLatency    = ((end - start) / 1000).toFixed(3);
+      
+      //correctness
+      start = performance.now();
       const correctness         = calculateCorrectness(repoIssues);
+      end = performance.now();
+      const correctnessLatency  = ((end - start) / 1000).toFixed(3);
+
+      //ramp up
+      start = performance.now();
       const rampUp              = calculateRampUpScore(repoUsers);
+      end = performance.now();
+      const rampUpLatency       = ((end - start) / 1000).toFixed(3);
+
+      //responsive maintainer
+      start = performance.now();
       const responsiveMaintainer = calculateResponsiveMaintainerScore(repoIssues);
+      end = performance.now();
+      const responsiveMaintainerLatency = ((end - start) / 1000).toFixed(3);
+
+      //net score
+      const netScore = calculateNetScore(busFactor, correctness, responsiveMaintainer, rampUp, foundLicense);
+
+      netScoreEnd = performance.now();
+
+      const netScoreLatency = ((netScoreEnd - netScoreStart) / 1000).toFixed(3);
+
 
       // print out scores (for testing)
-      console.log('Repository:   ', repository);
+      console.log('Repository:  ', repository);
+      console.log('NetScore:     ', netScore);
+      console.log('NetScore Latency:     ', netScoreLatency);
       console.log('Bus Factor:  ', busFactor);
+      console.log('Bus Factor Latency:  ', busFactorLatency);
       console.log('Correctness: ', correctness);
+      console.log('Correctness Latency: ', correctnessLatency);
       console.log('Ramp Up:     ', rampUp);
+      console.log('Ramp Up Latency:     ', rampUpLatency);
       console.log('Responsive Maintainer: ', responsiveMaintainer);
+      console.log('Responsive Maintainer Latency: ', responsiveMaintainerLatency);
       console.log('License Found: ', foundLicense);
+      console.log('License Latency: ', foundLicenseLatency);
   } 
   catch (error) {
     console.error('Error:', error); 
