@@ -28,7 +28,9 @@ const urls = url_file
   .map(url => url.trim())
   .filter(url => url.length > 0); // Filter out blank lines
 
-
+//read the urls from the given filepath REF: [3]
+const url_file = fs.readFileSync(filepath, 'utf-8'); //import file
+const urls = url_file.split('\n'); //split the urls up
 
 // import fetch/print functions and interfaces
 import calculateNetScore, { calculateBusFactorScore, calculateCorrectness,

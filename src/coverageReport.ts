@@ -39,7 +39,9 @@ const testResults: TestResults = readJSON<TestResults>(testResultsPath);
 // Calculate coverage percentage
 const totalLines = coverageSummary.total.lines.total;
 const coveredLines = coverageSummary.total.lines.covered;
-const coveragePercent = ((coveredLines / totalLines) * 100).toFixed(2);
+
+const coveragePercent = ((coveredLines / totalLines) * 100).toFixed(0);
+
 
 // Get the total and passed test cases
 const totalTests = testResults.numTotalTests;
@@ -50,7 +52,7 @@ const totalTestSuites = testResults.testResults.length;
 const passedTestSuites = testResults.testResults.filter(suite => suite.numFailingTests === 0).length;
 
 // Output the formatted result
-console.log(`Total Test Cases: ${totalTestSuites}`);
-console.log(`Passed Test Cases: ${passedTests}`);
+console.log(`Total: ${totalTests}`);
+console.log(`Passed: ${passedTests}`);
 console.log(`Coverage: ${coveragePercent}%`);
-console.log(`${passedTests}/${totalTestSuites} test cases passed. ${coveragePercent}% line coverage achieved.`);
+console.log(`${passedTests}/${totalTests} test cases passed. ${coveragePercent}% line coverage achieved.`);
