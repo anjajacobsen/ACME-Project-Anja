@@ -37,7 +37,12 @@ fi
 
 #test option to run our testing file
 if [ "$1" == "test" ]; then
-    npx jest
+    # Run Jest tests
+    npx jest --coverage --json --outputFile=coverage/testResults.json
+    # Compile the coverageReport.ts file to JavaScript using tsc
+    npx tsc ./src/coverageReport.ts
+    # Run the compiled JavaScript file (coverageReport.js)
+    node ./src/coverageReport.js
     exit 0
 fi
 

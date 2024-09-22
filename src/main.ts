@@ -1,59 +1,17 @@
 #!/usr/bin/env node 
+//got above line from ChatGPT REF: [1]
 import * as fs from 'fs';
-import * as path from 'path';
+
+// import logger
 import logger from './logger'; 
 
-// Get the mode from ./run {input}
-let input_args: string[] = process.argv.slice(2); // gets user arguments passed in from run bash script
-let filepath: string = input_args.length > 0 ? input_args[0] : "test.txt"; // default to "test.txt" if no argument
+//get the mode from ./run {input}
+let input_args: string[] = process.argv.slice(2); //gets user arguments pass in from run bash script REF: [2]
+let filepath: string = input_args.length > 0 ? input_args[0] : "test"; //if no mode is passed in, default to test
 
-// Declare urls in the outer scope so it's accessible throughout the script
-let urls: string[] = [];
-
-// Exported functions for file validation
-
-export function validateFilePath(filepath: string): void {
-    // Check if the file exists
-    if (!fs.existsSync(filepath)) {
-        logger.error(`File not found: ${filepath}`);
-        throw new Error(`Invalid file path: ${filepath}`);
-    }
-
-    // Check if the file has the correct .txt extension
-    if (path.extname(filepath) !== '.txt') {
-        logger.error(`File is not a .txt file: ${filepath}`);
-        throw new Error(`Only .txt files are allowed: ${filepath}`);
-    }
-}
-
-export function validateFileContent(urls: string[]): void {
-    const urlRegex = /^(https:\/\/github\.com\/|https:\/\/www\.npmjs\.com\/)/;
-    
-    for (const url of urls) {
-        if (url.trim() !== '' && !urlRegex.test(url)) {
-            logger.error(`Invalid URL found in file: ${url}`);
-            throw new Error(`File contains invalid URLs: ${url}`);
-        }
-    }
-}
-
-// Run validation
-try {
-    validateFilePath(filepath); // Validate the file path
-    
-    // Read the URLs from the given filepath
-    const url_file = fs.readFileSync(filepath, 'utf-8'); // import file
-    urls = url_file.split('\n').map(url => url.trim()); // split and trim the urls
-    
-    validateFileContent(urls); // Validate file content
-    logger.info('File validation passed');
-    
-} catch (error) {
-  const err = error as Error;
-  logger.error(`Invalid file detected: ${filepath}. Reason: ${err.message}`);
-  process.exit(1); // Exit with error status
-}
-
+//read the urls from the given filepath REF: [3]
+const url_file = fs.readFileSync(filepath, 'utf-8'); //import file
+const urls = url_file.split('\n'); //split the urls up
 
 // import fetch/print functions and interfaces
 import calculateNetScore, { calculateBusFactorScore, calculateCorrectness,
