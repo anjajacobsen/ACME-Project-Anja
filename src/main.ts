@@ -70,6 +70,22 @@ import fetchRepositoryInfo, { fetchRepositoryUsers, fetchRepositoryIssues,
 
 import { getLicense } from './License';
 
+interface RepositoryMetrics {
+  URL: string;
+  NetScore: number;
+  NetScore_Latency: number;
+  RampUp: number;
+  RampUp_Latency: number;
+  Correctness: number;
+  Correctness_Latency: number;
+  BusFactor: number;
+  BusFactor_Latency: number;
+  ResponsiveMaintainer: number;
+  ResponsiveMaintainer_Latency: number;
+  License: number;
+  License_Latency: number;
+}
+
 // Get the GitHub repository URL for a given NPM package
 export async function processPackageData(packageName: string): Promise<string> {
   const githubRepo = await getNpmPackageGithubRepo(packageName);
@@ -86,35 +102,6 @@ export async function processPackageData(packageName: string): Promise<string> {
   }
 }
 
-/////////////// FOR TESTING //////////////
-
-// const owner = 'ECE-461-Team-16'; 
-// const repository = 'ACME-Project';
-
-// can delete the section below if you want
-
-// const owner = 'nullivex';
-// const repository = 'nodist';
-
-// const owner = 'browserify';
-// const repository = 'browserify';
-
-// const owner = 'cloudinary';
-// const repository = 'cloudinary_npm';
-
-// const owner = 'lodash';
-// const repository = 'lodash';
-
-// const owner = 'expressjs';
-// const repository = 'express';
-
-// const owner = 'mrdoob';
-// const repository = 'three.js';
-
-// const owner = 'prathameshnetake;
-// const repository = 'libvlc';
-
-//////////////////////////////////////////
 for( let i = 0; i < urls.length; i++){ //loop through all of the urls
   
   
@@ -213,19 +200,38 @@ for( let i = 0; i < urls.length; i++){ //loop through all of the urls
 
 
       // print out scores (for testing)
-      console.log('Repository:  ', repository);
-      console.log('NetScore:     ', netScore);
-      console.log('NetScore Latency:     ', netScoreLatency);
-      console.log('Bus Factor:  ', busFactor);
-      console.log('Bus Factor Latency:  ', busFactorLatency);
-      console.log('Correctness: ', correctness);
-      console.log('Correctness Latency: ', correctnessLatency);
-      console.log('Ramp Up:     ', rampUp);
-      console.log('Ramp Up Latency:     ', rampUpLatency);
-      console.log('Responsive Maintainer: ', responsiveMaintainer);
-      console.log('Responsive Maintainer Latency: ', responsiveMaintainerLatency);
-      console.log('License Found: ', foundLicense);
-      console.log('License Latency: ', foundLicenseLatency);
+      // console.log('Repository:  ', repository);
+      // console.log('NetScore:     ', netScore);
+      // console.log('NetScore Latency:     ', netScoreLatency);
+      // console.log('Bus Factor:  ', busFactor);
+      // console.log('Bus Factor Latency:  ', busFactorLatency);
+      // console.log('Correctness: ', correctness);
+      // console.log('Correctness Latency: ', correctnessLatency);
+      // console.log('Ramp Up:     ', rampUp);
+      // console.log('Ramp Up Latency:     ', rampUpLatency);
+      // console.log('Responsive Maintainer: ', responsiveMaintainer);
+      // console.log('Responsive Maintainer Latency: ', responsiveMaintainerLatency);
+      // console.log('License Found: ', foundLicense);
+      // console.log('License Latency: ', foundLicenseLatency);
+
+      const repositoryMetrics: RepositoryMetrics = {
+        URL: urls[i],
+        NetScore: netScore,
+        NetScore_Latency: Number(netScoreLatency),
+        RampUp: busFactor,
+        RampUp_Latency: Number(rampUpLatency),
+        Correctness: correctness,
+        Correctness_Latency: 0.006,
+        BusFactor: busFactor,
+        BusFactor_Latency: Number(busFactorLatency),
+        ResponsiveMaintainer: responsiveMaintainer,
+        ResponsiveMaintainer_Latency: Number(responsiveMaintainerLatency),
+        License: foundLicense,
+        License_Latency: Number(foundLicenseLatency)
+      };
+
+      console.log(repositoryMetrics);
+
   } 
   catch (error) {
     console.error('Error:', error); 

@@ -118,7 +118,7 @@ var _loop_1 = function (i) {
     // Non-API metric calculations
     // const foundLicense : number = getLicense(urls[i], repository); // get the license for the repo
     (function () { return __awaiter(void 0, void 0, void 0, function () {
-        var link_split, owner, repository, githubRepoOut, link_split_npm, start, end, netScoreStart, netScoreEnd, foundLicense, foundLicenseLatency, repoInfo, repoIssues, repoUsers, busFactor, busFactorLatency, correctness, correctnessLatency, rampUp, rampUpLatency, responsiveMaintainer, responsiveMaintainerLatency, netScore, netScoreLatency, error_1;
+        var link_split, owner, repository, githubRepoOut, link_split_npm, start, end, netScoreStart, netScoreEnd, foundLicense, foundLicenseLatency, repoInfo, repoIssues, repoUsers, busFactor, busFactorLatency, correctness, correctnessLatency, rampUp, rampUpLatency, responsiveMaintainer, responsiveMaintainerLatency, netScore, netScoreLatency, repositoryMetrics, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -192,20 +192,22 @@ var _loop_1 = function (i) {
                     netScore = (0, CalculateMetrics_1.default)(busFactor, correctness, responsiveMaintainer, rampUp, foundLicense);
                     netScoreEnd = performance.now();
                     netScoreLatency = ((netScoreEnd - netScoreStart) / 1000).toFixed(3);
-                    // print out scores (for testing)
-                    console.log('Repository:  ', repository);
-                    console.log('NetScore:     ', netScore);
-                    console.log('NetScore Latency:     ', netScoreLatency);
-                    console.log('Bus Factor:  ', busFactor);
-                    console.log('Bus Factor Latency:  ', busFactorLatency);
-                    console.log('Correctness: ', correctness);
-                    console.log('Correctness Latency: ', correctnessLatency);
-                    console.log('Ramp Up:     ', rampUp);
-                    console.log('Ramp Up Latency:     ', rampUpLatency);
-                    console.log('Responsive Maintainer: ', responsiveMaintainer);
-                    console.log('Responsive Maintainer Latency: ', responsiveMaintainerLatency);
-                    console.log('License Found: ', foundLicense);
-                    console.log('License Latency: ', foundLicenseLatency);
+                    repositoryMetrics = {
+                        URL: urls[i],
+                        NetScore: netScore,
+                        NetScore_Latency: Number(netScoreLatency),
+                        RampUp: busFactor,
+                        RampUp_Latency: Number(rampUpLatency),
+                        Correctness: correctness,
+                        Correctness_Latency: 0.006,
+                        BusFactor: busFactor,
+                        BusFactor_Latency: Number(busFactorLatency),
+                        ResponsiveMaintainer: responsiveMaintainer,
+                        ResponsiveMaintainer_Latency: Number(responsiveMaintainerLatency),
+                        License: foundLicense,
+                        License_Latency: Number(foundLicenseLatency)
+                    };
+                    console.log(repositoryMetrics);
                     return [3 /*break*/, 10];
                 case 9:
                     error_1 = _a.sent();
@@ -216,25 +218,6 @@ var _loop_1 = function (i) {
         });
     }); })();
 };
-/////////////// FOR TESTING //////////////
-// const owner = 'ECE-461-Team-16'; 
-// const repository = 'ACME-Project';
-// can delete the section below if you want
-// const owner = 'nullivex';
-// const repository = 'nodist';
-// const owner = 'browserify';
-// const repository = 'browserify';
-// const owner = 'cloudinary';
-// const repository = 'cloudinary_npm';
-// const owner = 'lodash';
-// const repository = 'lodash';
-// const owner = 'expressjs';
-// const repository = 'express';
-// const owner = 'mrdoob';
-// const repository = 'three.js';
-// const owner = 'prathameshnetake;
-// const repository = 'libvlc';
-//////////////////////////////////////////
 for (var i = 0; i < urls.length; i++) {
     _loop_1(i);
 }
