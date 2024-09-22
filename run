@@ -31,13 +31,16 @@ if [ "$1" == "install" ]; then
 
     npm install axios
 
+    npm install jest
+
+    npm i --save-dev @types/jest
+
     exit 0
 fi
 
 #test option to run our testing file
 if [ "$1" == "test" ]; then
-    npx tsc ./src/test.ts
-    node ./src/test.js 
+    npx jest
     exit 0
 fi
 
