@@ -9,7 +9,7 @@ const logFile = process.env.LOG_FILE;
 const githubToken = process.env.GITHUB_TOKEN;
 
 // Exit with an error code if the required environment variables are not set
-if (!logFile || !githubToken) {
+if (logFile == "" || githubToken == "") {
   logger.error("Error: LOG_FILE or GITHUB_TOKEN environment variable is not set.");
   process.exit(1); // Exit unsuccessfully
 }
@@ -18,11 +18,15 @@ if (!logFile || !githubToken) {
 let input_args: string[] = process.argv.slice(2); //gets user arguments pass in from run bash script REF: [2]
 let filepath: string = input_args.length > 0 ? input_args[0] : "test"; //if no mode is passed in, default to test
 
-// Only declare these variables once
+// Read the URLs from the given filepath
 const url_file = fs.readFileSync(filepath, 'utf-8'); // Import file
-const urls = url_file.split('\n'); // Split the URLs
 
-// Use the variables as needed throughout the file
+// Split the URLs, trim whitespace, and filter out any empty lines
+const urls = url_file
+  .split('\n')
+  .map(url => url.trim())
+  .filter(url => url.length > 0); // Filter out blank lines
+
 
 
 // import fetch/print functions and interfaces
