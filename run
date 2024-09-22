@@ -26,7 +26,7 @@ if [ "$1" == "install" ]; then
 
     npm install jest > /dev/null 2>&1
 
-    # sudo apt install jest
+    npm install --save-dev jest@29.7.0 > /dev/null 2>&1
 
     npm i --save-dev @types/jest > /dev/null 2>&1
 
