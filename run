@@ -1,39 +1,36 @@
 #!/bin/bash
 
-echo "starting"
-
 #install option to install dependencies
 if [ "$1" == "install" ]; then
-    echo "installing dependencies"
 
     if ! command -v node &> /dev/null; then #checks for node.js 
-        echo "node js not found, installing time!"
-        sudo apt update
-        sudo apt install -y nodejs
+        sudo apt update > /dev/null 2>&1
+        sudo apt install -y nodejs > /dev/null 2>&1
     fi
-    echo "node js found!"
 
     if ! command -v npm &> /dev/null; then #checks for npm
-        echo "npm not found, installing time!"
-        sudo apt install -y npm
+        sudo apt install -y npm > /dev/null 2>&1
     fi
-    echo "npm found!"
 
-    npm install
+    npm install > /dev/null 2>&1
 
-    npm install dotenv
+    npm install dotenv > /dev/null 2>&1
 
-    npm install winston
+    npm install winston > /dev/null 2>&1
 
-    npm install shelljs
+    npm install shelljs > /dev/null 2>&1
 
-    npm install isomorphic-git
+    npm install isomorphic-git > /dev/null 2>&1
 
-    npm install axios
+    npm install axios > /dev/null 2>&1
 
-    npm install jest
+    npm install jest > /dev/null 2>&1
 
-    npm i --save-dev @types/jest
+    # sudo apt install jest
+
+    npm i --save-dev @types/jest > /dev/null 2>&1
+
+    echo "8 dependencies installed..."
 
     exit 0
 fi
