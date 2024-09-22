@@ -51,7 +51,11 @@ fi
 if [ -n "$1" ]; then
     npx tsc ./src/main.ts
     node ./src/main.js "$1"
-    exit 0
+    # Capture the exit code of the Node.js process
+    NODE_EXIT_CODE=$?
+
+    # Exit with the same code as the Node.js process
+    exit $NODE_EXIT_CODE
 fi
 
 #if no argument is passed, exit 1 for error and print message
