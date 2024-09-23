@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for logger.ts</title>
+    <title>Code coverage report for logger.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="prettify.css" />
     <link rel="stylesheet" href="base.css" />
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="index.html">All files</a> logger.ts</h1>
+        <h1><a href="index.html">All files</a> logger.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -83,24 +83,18 @@
 <a name='L18'></a><a href='#L18'>18</a>
 <a name='L19'></a><a href='#L19'>19</a>
 <a name='L20'></a><a href='#L20'>20</a>
-<a name='L21'></a><a href='#L21'>21</a>
-<a name='L22'></a><a href='#L22'>22</a>
-<a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a>
-<a name='L25'></a><a href='#L25'>25</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L21'></a><a href='#L21'>21</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -108,33 +102,27 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import * as winston from 'winston';</span>
-&nbsp;
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">"use strict";
+<span class="cstat-no" title="statement not covered" >Object.defineProperty(exports, "__esModule", { value: true });</span>
+var winston = <span class="cstat-no" title="statement not covered" >require("winston");</span>
 // Get log level from environment variable (default to 'info')
-const logLevel = <span class="cstat-no" title="statement not covered" >process.env.LOG_LEVEL || 'info';</span>
-&nbsp;
+var logLevel = <span class="cstat-no" title="statement not covered" >process.env.LOG_LEVEL || 'info';</span>
 // Get log file path from environment variable (default to './app.log')
-const logFile = <span class="cstat-no" title="statement not covered" >process.env.LOG_FILE || './app.log';</span>
-&nbsp;
+var logFile = <span class="cstat-no" title="statement not covered" >process.env.LOG_FILE || './app.log';</span>
 // Create a Winston logger instance
-const logger = <span class="cstat-no" title="statement not covered" >winston.createLogger({</span>
-  level: logLevel,
-  format: winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.printf(<span class="fstat-no" title="function not covered" >({</span> timestamp, level, message }) =&gt; {
-<span class="cstat-no" title="statement not covered" >      return `${timestamp} [${level.toUpperCase()}] ${message}`;</span>
-    })
-  ),
-  transports: [
-    new winston.transports.File({ filename: logFile }),
-    new winston.transports.Console() // Delete if we don't want console output
-  ]
+var logger = <span class="cstat-no" title="statement not covered" >winston.createLogger({</span>
+    level: logLevel,
+    format: winston.format.combine(winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), winston.format.printf(<span class="fstat-no" title="function not covered" >fu</span>nction (_a) {
+        var timestamp = <span class="cstat-no" title="statement not covered" >_a.timestamp,</span> level = <span class="cstat-no" title="statement not covered" >_a.level,</span> message = <span class="cstat-no" title="statement not covered" >_a.message;</span>
+<span class="cstat-no" title="statement not covered" >        return "".concat(timestamp, " [").concat(level.toUpperCase(), "] ").concat(message);</span>
+    })),
+    transports: [
+        new winston.transports.File({ filename: logFile }),
+        new winston.transports.Console() // Delete if we don't want console output
+    ]
 });
-&nbsp;
-<span class="cstat-no" title="statement not covered" >export default logger;</span>
+<span class="cstat-no" title="statement not covered" >exports.default = logger;</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -142,7 +130,7 @@ const logger = <span class="cstat-no" title="statement not covered" >winston.cre
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-09-23T01:17:50.356Z
+                at 2024-09-23T01:06:36.560Z
             </div>
         <script src="prettify.js"></script>
         <script>
