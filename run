@@ -40,6 +40,9 @@ fi
 
 #test option to run our testing file
 if [ "$1" == "test" ]; then
+    #hot fix for ./run test - deletes all js files so it doesnt get confused
+    find ./src -name "*.js" -type f -delete 
+
     # Run Jest tests but suppress the output to /dev/null
     npx jest --coverage --json --outputFile=coverage/testResults.json > /dev/null 2>&1
 
